@@ -4,7 +4,7 @@ import { getHabits, updateHabit, deleteHabit } from '@/lib/habit-storage';
 import { Habit } from '@/types/habit';
 import HabitCard from '@/components/HabitCard';
 import { MadeWithDyad } from "@/components/made-with-dyad";
-import { Plus, Settings, Archive, Check, Upload, Download, X } from 'lucide-react'; // Added X icon
+import { Plus, Settings, Archive, Check, Upload, Download, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import {
@@ -13,7 +13,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { exportHabits, importHabits } from '@/lib/data-management'; // Import data management functions
+import { exportHabits, importHabits } from '@/lib/data-management';
 
 const Index = () => {
   const [habits, setHabits] = useState<Habit[]>([]);
@@ -79,68 +79,69 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-4">
-      <header className="flex justify-between items-center mb-6">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="text-gray-400 hover:text-white">
-              <Settings className="h-6 w-6" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="bg-gray-800 border-gray-700 text-white">
-            <DropdownMenuItem asChild>
-              <Link to="/archived-habits" className="flex items-center">
-                <Archive className="mr-2 h-4 w-4" /> View Archived Habits
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={handleExport} className="flex items-center">
-              <Download className="mr-2 h-4 w-4" /> Export Data
-            </DropdownMenuItem>
-            <DropdownMenuItem className="flex items-center relative">
-              <Upload className="mr-2 h-4 w-4" /> Import Data
-              <input
-                type="file"
-                accept=".json"
-                onChange={handleImport}
-                className="absolute inset-0 opacity-0 cursor-pointer"
-              />
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-
-        <h1 className="text-3xl font-bold">HabitKit</h1>
-        <Link to="/create-habit">
-          <Button variant="ghost" size="icon" className="text-gray-400 hover:text-white">
-            <Plus className="h-6 w-6" />
-          </Button>
-        </Link>
-      </header>
-
-      <div className="space-y-4 mb-8">
-        {habits.length === 0 ? (
-          <div className="text-center text-gray-400 mt-10">
-            <p className="text-lg mb-4">No habits yet. Start by creating one!</p>
-            <Link to="/create-habit">
-              <Button className="bg-blue-600 hover:bg-blue-700 text-white">
-                <Plus className="mr-2 h-4 w-4" /> Create First Habit
+    <div className="min-h-screen bg-gray-900 text-white p-4 flex flex-col items-center">
+      <div className="w-full max-w-md">
+        <header className="flex justify-between items-center mb-6">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="text-gray-400 hover:text-white">
+                <Settings className="h-6 w-6" />
               </Button>
-            </Link>
-          </div>
-        ) : (
-          habits.map((habit) => (
-            <HabitCard
-              key={habit.id}
-              habit={habit}
-              onHabitUpdate={handleHabitUpdate}
-              onArchiveHabit={handleArchiveHabit}
-              onDeleteHabit={handleDeleteHabit}
-            />
-          ))
-        )}
-      </div>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="bg-gray-800 border-gray-700 text-white">
+              <DropdownMenuItem asChild>
+                <Link to="/archived-habits" className="flex items-center">
+                  <Archive className="mr-2 h-4 w-4" /> View Archived Habits
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleExport} className="flex items-center">
+                <Download className="mr-2 h-4 w-4" /> Export Data
+              </DropdownMenuItem>
+              <DropdownMenuItem className="flex items-center relative">
+                <Upload className="mr-2 h-4 w-4" /> Import Data
+                <input
+                  type="file"
+                  accept=".json"
+                  onChange={handleImport}
+                  className="absolute inset-0 opacity-0 cursor-pointer"
+                />
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
-      {/* The "View Archived Habits" button is now in the settings dropdown */}
-      <MadeWithDyad />
+          <h1 className="text-3xl font-bold">HabitKit</h1>
+          <Link to="/create-habit">
+            <Button variant="ghost" size="icon" className="text-gray-400 hover:text-white">
+              <Plus className="h-6 w-6" />
+            </Button>
+          </Link>
+        </header>
+
+        <div className="space-y-4 mb-8">
+          {habits.length === 0 ? (
+            <div className="text-center text-gray-400 mt-10">
+              <p className="text-lg mb-4">No habits yet. Start by creating one!</p>
+              <Link to="/create-habit">
+                <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+                  <Plus className="mr-2 h-4 w-4" /> Create First Habit
+                </Button>
+              </Link>
+            </div>
+          ) : (
+            habits.map((habit) => (
+              <HabitCard
+                key={habit.id}
+                habit={habit}
+                onHabitUpdate={handleHabitUpdate}
+                onArchiveHabit={handleArchiveHabit}
+                onDeleteHabit={handleDeleteHabit}
+              />
+            ))
+          )}
+        </div>
+
+        <MadeWithDyad />
+      </div>
     </div>
   );
 };
