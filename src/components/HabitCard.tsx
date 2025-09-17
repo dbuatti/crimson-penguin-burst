@@ -75,8 +75,10 @@ const HabitCard: React.FC<HabitCardProps> = ({ habit, onHabitUpdate, onArchiveHa
                   <Edit className="mr-2 h-4 w-4" /> Edit
                 </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem className="flex items-center">
-                <CalendarDays className="mr-2 h-4 w-4" /> Calendar
+              <DropdownMenuItem asChild> {/* Added asChild for Link */}
+                <Link to={`/habit-calendar/${habit.id}`} className="flex items-center">
+                  <CalendarDays className="mr-2 h-4 w-4" /> Calendar
+                </Link>
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => onArchiveHabit(habit.id)} className="flex items-center">
                 <Archive className="mr-2 h-4 w-4" /> {habit.archived ? 'Unarchive' : 'Archive'}

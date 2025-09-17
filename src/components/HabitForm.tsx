@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -17,6 +17,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import IconPicker from './IconPicker';
 import ColorPicker from './ColorPicker';
 import { HabitFormData } from '@/types/habit';
+import { PlusCircle, MinusCircle } from 'lucide-react';
 
 const formSchema = z.object({
   name: z.string().min(1, { message: 'Habit name is required.' }),
@@ -25,7 +26,7 @@ const formSchema = z.object({
   color: z.string().min(1, { message: 'Color is required.' }),
   goalType: z.enum(['daily', 'weekly', 'monthly']),
   goalValue: z.coerce.number().min(1, { message: 'Goal value must be at least 1.' }),
-  reminders: z.array(z.string()).optional(), // Simplified for now
+  reminders: z.array(z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/, "Invalid time format (HH:MM)")).optional(),
 });
 
 interface HabitFormProps {
@@ -53,6 +54,23 @@ const HabitForm: React.FC<HabitFormProps> = ({ initialData, onSubmit, isSubmitti
       form.reset(initialData);
     }
   }, [initialData, form]);
+
+  const reminders = form.watch('reminders') || [];
+
+  const addReminder = () => {
+    form.setValue('reminders', [...reminders, ''], { shouldValidate: true });
+  };
+
+  const updateReminder = (index: number, value: string) => {
+    const newReminders = [...reminders];
+    newReminders[index] = value;
+    form.setValue('reminders', newReminders, { shouldValidate: true });
+  };
+
+  const removeReminder = (index: number) => {
+    const newReminders = reminders.filter((_, i) => i !== index);
+    form.setValue('reminders', newReminders, { shouldValidate: true });
+  };
 
   return (
     <Form {...form}>
@@ -146,7 +164,36 @@ const HabitForm: React.FC<HabitFormProps> = ({ initialData, onSubmit, isSubmitti
             )}
           />
         </div>
-        {/* Reminders field can be added here later */}
+
+        <FormItem>
+          <FormLabel className="text-white">Reminders</FormLabel>
+          <div className="space-y-2">
+            {reminders.map((reminderTime, index) => (
+              <div key={index} className="flex items-center space-x-2">
+                <Input
+                  type="time"
+                  value={reminderTime}
+                  onChange={(e) => updateReminder(index, e.target.value)}
+                  className="bg-gray-700 border-gray-600 text-white"
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => removeReminder(index)}
+                  className="text-red-400 hover:text-red-300"
+                >
+                  <MinusCircle className="h-5 w-5" />
+                </Button>
+              </div>
+            ))}
+            <Button type="button" variant="outline" onClick={addReminder} className="w-full bg-gray-700 border-gray-600 text-white hover:bg-gray-600">
+              <PlusCircle className="mr-2 h-4 w-4" /> Add Reminder
+            </Button>
+          </div>
+          <FormMessage>{form.formState.errors.reminders?.message}</FormMessage>
+        </FormItem>
+
         <Button type="submit" disabled={isSubmitting} className="w-full bg-blue-600 hover:bg-blue-700 text-white">
           {isSubmitting ? 'Saving...' : 'Save Habit'}
         </Button>
