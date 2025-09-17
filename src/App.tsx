@@ -7,7 +7,8 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import CreateHabit from "./pages/CreateHabit";
 import EditHabit from "./pages/EditHabit";
-import HabitCalendar from "./pages/HabitCalendar"; // Import the new calendar page
+import HabitCalendar from "./pages/HabitCalendar";
+import ArchivedHabits from "./pages/ArchivedHabits"; // Import the new archived habits page
 
 const queryClient = new QueryClient();
 
@@ -21,7 +22,8 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/create-habit" element={<CreateHabit />} />
           <Route path="/edit-habit/:id" element={<EditHabit />} />
-          <Route path="/habit-calendar/:id" element={<HabitCalendar />} /> {/* New route for calendar */}
+          <Route path="/habit-calendar/:id" element={<HabitCalendar />} />
+          <Route path="/archived-habits" element={<ArchivedHabits />} /> {/* New route for archived habits */}
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
