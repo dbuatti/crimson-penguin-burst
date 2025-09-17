@@ -8,7 +8,7 @@ interface HabitGridProps {
 }
 
 const WEEK_DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-const NUM_WEEKS_TO_SHOW = 12; // Display the last 12 weeks
+const NUM_WEEKS_TO_SHOW = 7; // Display the last 7 weeks
 
 const HabitGrid: React.FC<HabitGridProps> = ({
   completionDates,
@@ -35,7 +35,7 @@ const HabitGrid: React.FC<HabitGridProps> = ({
   return (
     <div className="p-2 rounded-md bg-gray-800/50 dark:bg-gray-900/50 overflow-hidden">
       {/* Day labels */}
-      <div className="grid grid-cols-7 gap-px mb-1">
+      <div className="grid grid-cols-7 gap-1 mb-1">
         {WEEK_DAYS.map((day) => (
           <div key={day} className="text-center text-xs text-gray-400">
             {day}
@@ -44,17 +44,16 @@ const HabitGrid: React.FC<HabitGridProps> = ({
       </div>
 
       {/* Habit completion grid */}
-      <div className="grid grid-cols-7 gap-px">
+      <div className="grid grid-cols-7 gap-1">
         {dates.map((date, index) => (
           <div
             key={index}
             className={cn(
-              "w-4 h-4 rounded-sm", // Slightly larger squares for better visibility
-              "bg-gray-700 dark:bg-gray-800", // Default background for incomplete/future days
+              "w-5 h-5 rounded-sm", // Slightly larger squares for better visibility
+              "bg-gray-700", // Default background for incomplete/future days
               {
                 "opacity-50": date > today, // Dim future dates
-                "border border-white/50": isSameDay(date, today) && !isCompleted(date), // Highlight today if not completed
-                "border border-white": isSameDay(date, today) && isCompleted(date), // Highlight today if completed
+                "border border-white": isSameDay(date, today), // Highlight today with a white border
               }
             )}
             style={{ backgroundColor: isCompleted(date) ? habitColor : undefined }}
