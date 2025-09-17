@@ -29,7 +29,7 @@ const HabitGrid: React.FC<HabitGridProps> = ({
   };
 
   return (
-    <div className="grid grid-cols-13 gap-1 p-2 rounded-md bg-gray-800/50 dark:bg-gray-900/50 overflow-hidden">
+    <div className="grid grid-cols-13 gap-px p-2 rounded-md bg-gray-800/50 dark:bg-gray-900/50 overflow-hidden">
       {dates.map((date, index) => (
         <div
           key={index}
