@@ -3,7 +3,8 @@ import { Habit } from '@/types/habit';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Link } from 'react-router-dom';
-import { Edit, CalendarDays, Archive, Share2, Trash2 } from 'lucide-react';
+import { Edit, CalendarDays, Archive, Share2, Trash2, MoreVertical, Circle } from 'lucide-react'; // Import all necessary icons directly
+import * as LucideIcons from 'lucide-react'; // Import all Lucide icons as a namespace
 import { Button } from '@/components/ui/button';
 import HabitGrid from './HabitGrid';
 import { toggleHabitCompletion } from '@/lib/habit-storage';
@@ -13,7 +14,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreVertical } from 'lucide-react';
 
 interface HabitCardProps {
   habit: Habit;
@@ -32,15 +32,12 @@ const HabitCard: React.FC<HabitCardProps> = ({ habit, onHabitUpdate, onArchiveHa
   };
 
   const IconComponent = React.useMemo(() => {
-    try {
-      // Dynamically import icon from lucide-react
-      const { [habit.icon]: LucideIcon } = require('lucide-react');
-      return LucideIcon;
-    } catch (e) {
-      console.warn(`Icon "${habit.icon}" not found, using default.`);
-      const { Circle } = require('lucide-react'); // Fallback icon
-      return Circle;
+    const RequestedIcon = (LucideIcons as any)[habit.icon];
+    if (RequestedIcon) {
+      return RequestedIcon;
     }
+    console.warn(`Icon "${habit.icon}" not found, using default.`);
+    return Circle; // Fallback icon
   }, [habit.icon]);
 
   return (
@@ -75,7 +72,7 @@ const HabitCard: React.FC<HabitCardProps> = ({ habit, onHabitUpdate, onArchiveHa
                   <Edit className="mr-2 h-4 w-4" /> Edit
                 </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem asChild> {/* Added asChild for Link */}
+              <DropdownMenuItem asChild>
                 <Link to={`/habit-calendar/${habit.id}`} className="flex items-center">
                   <CalendarDays className="mr-2 h-4 w-4" /> Calendar
                 </Link>
