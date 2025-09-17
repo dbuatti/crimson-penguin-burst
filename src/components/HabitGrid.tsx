@@ -1,5 +1,6 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
+import { format, subDays } from 'date-fns';
 
 interface HabitGridProps {
   completionDates: string[];
@@ -11,11 +12,18 @@ interface HabitGridProps {
 const HabitGrid: React.FC<HabitGridProps> = ({
   completionDates,
   habitColor,
-  startDate = new Date(new Date().setDate(new Date().getDate() - 90)), // Default to 90 days ago
-  numDays = 91, // Default to 91 days (approx 13 weeks)
+  startDate: propStartDate,
+  numDays: propNumDays,
 }) => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
+
+  // Default to showing the last 4 weeks (28 days)
+  const defaultNumDays = 28;
+  const defaultStartDate = subDays(today, defaultNumDays - 1); // Start 27 days ago to include today
+
+  const numDays = propNumDays ?? defaultNumDays;
+  const startDate = propStartDate ?? defaultStartDate;
 
   const dates = Array.from({ length: numDays }).map((_, i) => {
     const date = new Date(startDate);
@@ -24,19 +32,19 @@ const HabitGrid: React.FC<HabitGridProps> = ({
   });
 
   const isCompleted = (date: Date) => {
-    const dateString = date.toISOString().split('T')[0];
+    const dateString = format(date, 'yyyy-MM-dd');
     return completionDates.includes(dateString);
   };
 
   return (
-    <div className="grid grid-cols-13 gap-px p-2 rounded-md bg-gray-800/50 dark:bg-gray-900/50 overflow-hidden">
+    <div className="grid grid-cols-7 gap-px p-2 rounded-md bg-gray-800/50 dark:bg-gray-900/50 overflow-hidden">
       {dates.map((date, index) => (
         <div
           key={index}
           className={cn(
             "w-3 h-3 rounded-sm",
-            isCompleted(date) ? `bg-[${habitColor}]` : "bg-gray-700 dark:bg-gray-800",
             {
+              "bg-gray-700 dark:bg-gray-800": !isCompleted(date), // Only apply gray if not completed
               "opacity-50": date > today, // Dim future dates
             }
           )}

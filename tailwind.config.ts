@@ -91,7 +91,8 @@ export default {
         "accordion-up": "accordion-up 0.2s ease-out",
       },
       gridTemplateColumns: {
-        '13': 'repeat(13, minmax(0, 1fr))', // Define a 13-column grid
+        '13': 'repeat(13, minmax(0, 1fr))',
+        '7': 'repeat(7, minmax(0, 1fr))', // Add a 7-column grid
       },
     },
   },
