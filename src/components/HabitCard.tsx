@@ -41,7 +41,7 @@ const HabitCard: React.FC<HabitCardProps> = ({ habit, onHabitUpdate, onArchiveHa
   }, [habit.icon]);
 
   return (
-    <Card className="w-full bg-gray-800/50 dark:bg-gray-900/50 text-white border-none shadow-lg">
+    <Card className="w-full bg-gray-900 text-white border-none shadow-lg"> {/* Updated card background */}
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <div className="flex items-center space-x-3">
           <div className="p-2 rounded-full" style={{ backgroundColor: habit.color }}>
@@ -57,8 +57,13 @@ const HabitCard: React.FC<HabitCardProps> = ({ habit, onHabitUpdate, onArchiveHa
             id={`habit-${habit.id}`}
             checked={isCompletedToday}
             onCheckedChange={handleToggleCompletion}
-            className="h-6 w-6 rounded-full border-2 border-gray-500 data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500"
-            style={{ backgroundColor: isCompletedToday ? habit.color : undefined, borderColor: isCompletedToday ? habit.color : undefined }}
+            className="h-6 w-6 rounded-full border-2 
+                       data-[state=unchecked]:bg-gray-700 data-[state=unchecked]:border-gray-600 
+                       data-[state=checked]:text-white" // Ensure checkmark is white
+            style={{ 
+              backgroundColor: isCompletedToday ? habit.color : undefined, 
+              borderColor: isCompletedToday ? habit.color : undefined 
+            }}
           />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

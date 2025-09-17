@@ -49,7 +49,7 @@ const HabitGrid: React.FC<HabitGridProps> = ({
           <div
             key={index}
             className={cn(
-              "w-5 h-5 rounded-sm", // Slightly larger squares for better visibility
+              "w-5 h-5 rounded-md", // Changed to rounded-md for slightly more rounded corners
               "bg-gray-700", // Default background for incomplete/future days
               {
                 "opacity-50": date > today, // Dim future dates
