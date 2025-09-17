@@ -106,10 +106,9 @@ const HabitCalendar: React.FC = () => {
             day_disabled: "text-muted-foreground opacity-50",
             day_range_middle: "aria-selected:bg-accent aria-selected:text-accent-foreground",
             day_hidden: "invisible",
-            // Removed ...modifiersStyles from here
           }}
           modifiers={modifiers}
-          styles={modifiersStyles} {/* Correctly passing modifiersStyles to the styles prop */}
+          modifiersStyles={modifiersStyles}
           components={{
             IconLeft: ({ ...props }) => <ChevronLeft className="h-4 w-4" />,
             IconRight: ({ ...props }) => <ChevronRight className="h-4 w-4" />,

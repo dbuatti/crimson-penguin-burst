@@ -1,4 +1,5 @@
-import { getHabits, saveHabits, Habit } from './habit-storage';
+import { getHabits, saveHabits } from './habit-storage';
+import { Habit } from '@/types/habit'; // Import Habit type directly
 import { toast } from 'sonner';
 import { Check, X } from 'lucide-react';
 

@@ -4,7 +4,7 @@ import { getHabits, updateHabit, deleteHabit } from '@/lib/habit-storage';
 import { Habit } from '@/types/habit';
 import HabitCard from '@/components/HabitCard';
 import { MadeWithDyad } from "@/components/made-with-dyad";
-import { Plus, Settings, Archive, Check, Upload, Download } from 'lucide-react';
+import { Plus, Settings, Archive, Check, Upload, Download, X } from 'lucide-react'; // Added X icon
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import {
