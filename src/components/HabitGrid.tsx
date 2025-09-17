@@ -16,21 +16,16 @@ const HabitGrid: React.FC<HabitGridProps> = ({
 }) => {
   const today = new Date();
   today.setHours(0, 0, 0, 0); // Normalize today to start of day
+  const todayFormatted = format(today, 'yyyy-MM-dd'); // String representation of today for consistent comparison
 
   // Calculate the start date for the grid to show NUM_WEEKS_TO_SHOW weeks ending on the current day's week.
-  // We want the grid to start on a Monday and end on a Sunday, covering NUM_WEEKS_TO_SHOW weeks.
-  const startOfCurrentWeek = startOfWeek(today, { weekStartsOn: 1 }); // Monday is the start of the week (0 for Sunday, 1 for Monday)
+  const startOfCurrentWeek = startOfWeek(today, { weekStartsOn: 1 }); // Monday is the start of the week
   const gridStartDate = subWeeks(startOfCurrentWeek, NUM_WEEKS_TO_SHOW - 1);
 
   const dates: Date[] = [];
   for (let i = 0; i < NUM_WEEKS_TO_SHOW * 7; i++) {
     dates.push(addDays(gridStartDate, i));
   }
-
-  const isCompleted = (date: Date) => {
-    const dateString = format(date, 'yyyy-MM-dd');
-    return completionDates.includes(dateString);
-  };
 
   return (
     <div className="p-2 rounded-md bg-gray-800/50 dark:bg-gray-900/50 overflow-hidden">
@@ -45,20 +40,26 @@ const HabitGrid: React.FC<HabitGridProps> = ({
 
       {/* Habit completion grid */}
       <div className="grid grid-cols-7 gap-1">
-        {dates.map((date, index) => (
-          <div
-            key={index}
-            className={cn(
-              "w-5 h-5 rounded-md", // Changed to rounded-md for slightly more rounded corners
-              "bg-gray-700", // Default background for incomplete/future days
-              {
-                "opacity-50": date > today, // Dim future dates
-                "border border-white": isSameDay(date, today), // Highlight today with a white border
-              }
-            )}
-            style={{ backgroundColor: isCompleted(date) ? habitColor : undefined }}
-          />
-        ))}
+        {dates.map((date, index) => {
+          const dateFormatted = format(date, 'yyyy-MM-dd');
+          const isCurrentDay = dateFormatted === todayFormatted; // Check if this grid cell represents today
+          const isCompleted = completionDates.includes(dateFormatted);
+
+          return (
+            <div
+              key={index}
+              className={cn(
+                "w-5 h-5 rounded-md",
+                "bg-gray-700", // Default background for incomplete/future days
+                {
+                  "opacity-50": date > today, // Dim future dates (using Date object comparison)
+                  "border border-white": isCurrentDay, // Highlight today with a white border (using string comparison)
+                }
+              )}
+              style={{ backgroundColor: isCompleted ? habitColor : undefined }}
+            />
+          );
+        })}
       </div>
     </div>
   );
