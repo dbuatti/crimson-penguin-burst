@@ -28,11 +28,11 @@ const HabitGrid: React.FC<HabitGridProps> = ({
   }
 
   return (
-    <div className="p-2 rounded-md bg-gray-800/50 dark:bg-gray-900/50 overflow-hidden">
+    <div className="p-3 rounded-md bg-secondary border border-border overflow-hidden">
       {/* Day labels */}
-      <div className="grid grid-cols-7 gap-1 mb-1">
+      <div className="grid grid-cols-7 gap-1 mb-2">
         {WEEK_DAYS.map((day) => (
-          <div key={day} className="text-center text-xs text-gray-400">
+          <div key={day} className="text-center text-xs font-medium text-muted-foreground">
             {day}
           </div>
         ))}
@@ -49,11 +49,11 @@ const HabitGrid: React.FC<HabitGridProps> = ({
             <div
               key={index}
               className={cn(
-                "w-5 h-5 rounded-md",
-                "bg-gray-700", // Default background for incomplete/future days
+                "w-5 h-5 rounded-sm transition-all duration-200",
+                "bg-accent", // Default background for incomplete/future days
                 {
                   "opacity-50": date > today, // Dim future dates (using Date object comparison)
-                  "border border-white": isCurrentDay, // Highlight today with a white border (using string comparison)
+                  "border border-primary/50": isCurrentDay, // Highlight today with a subtle border
                 }
               )}
               style={{ backgroundColor: isCompleted ? habitColor : undefined }}

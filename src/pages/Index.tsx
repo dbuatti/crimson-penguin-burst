@@ -79,25 +79,25 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-4 flex flex-col items-center">
+    <div className="min-h-screen bg-background text-foreground p-4 flex flex-col items-center">
       <div className="w-full max-w-md">
         <header className="flex justify-between items-center mb-6">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="text-gray-400 hover:text-white">
+              <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground transition-colors duration-200">
                 <Settings className="h-6 w-6" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="bg-gray-800 border-gray-700 text-white">
-              <DropdownMenuItem asChild>
+            <DropdownMenuContent align="start" className="bg-popover border-border text-foreground shadow-lg">
+              <DropdownMenuItem asChild className="hover:bg-accent hover:text-accent-foreground transition-colors duration-150">
                 <Link to="/archived-habits" className="flex items-center">
                   <Archive className="mr-2 h-4 w-4" /> View Archived Habits
                 </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleExport} className="flex items-center">
+              <DropdownMenuItem onClick={handleExport} className="flex items-center hover:bg-accent hover:text-accent-foreground transition-colors duration-150">
                 <Download className="mr-2 h-4 w-4" /> Export Data
               </DropdownMenuItem>
-              <DropdownMenuItem className="flex items-center relative">
+              <DropdownMenuItem className="flex items-center relative hover:bg-accent hover:text-accent-foreground transition-colors duration-150">
                 <Upload className="mr-2 h-4 w-4" /> Import Data
                 <input
                   type="file"
@@ -109,9 +109,9 @@ const Index = () => {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <h1 className="text-3xl font-bold">HabitKit</h1>
+          <h1 className="text-3xl font-bold text-foreground">HabitKit</h1>
           <Link to="/create-habit">
-            <Button variant="ghost" size="icon" className="text-gray-400 hover:text-white">
+            <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground transition-colors duration-200">
               <Plus className="h-6 w-6" />
             </Button>
           </Link>
@@ -119,10 +119,10 @@ const Index = () => {
 
         <div className="space-y-4 mb-8">
           {habits.length === 0 ? (
-            <div className="text-center text-gray-400 mt-10">
+            <div className="text-center text-muted-foreground mt-10 p-4 bg-card border border-border rounded-lg shadow-md">
               <p className="text-lg mb-4">No habits yet. Start by creating one!</p>
               <Link to="/create-habit">
-                <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+                <Button className="bg-primary hover:bg-primary/90 text-primary-foreground transition-colors duration-200">
                   <Plus className="mr-2 h-4 w-4" /> Create First Habit
                 </Button>
               </Link>

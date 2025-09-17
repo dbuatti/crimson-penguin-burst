@@ -30,12 +30,12 @@ const CreateHabit: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-4 flex flex-col items-center">
+    <div className="min-h-screen bg-background text-foreground p-4 flex flex-col items-center">
       <div className="w-full max-w-md flex justify-between items-center mb-6">
-        <Button variant="ghost" size="icon" onClick={() => navigate('/')} className="text-gray-400 hover:text-white">
+        <Button variant="ghost" size="icon" onClick={() => navigate('/')} className="text-muted-foreground hover:text-foreground transition-colors duration-200">
           <X className="h-6 w-6" />
         </Button>
-        <h1 className="text-2xl font-bold">Create New Habit</h1>
+        <h1 className="text-2xl font-bold text-foreground">Create New Habit</h1>
         <div className="w-6" /> {/* Placeholder for alignment */}
       </div>
       <div className="w-full max-w-md">

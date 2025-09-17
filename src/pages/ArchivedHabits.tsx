@@ -47,20 +47,20 @@ const ArchivedHabits: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-4">
-      <header className="flex justify-between items-center mb-6">
-        <Button variant="ghost" size="icon" onClick={() => navigate('/')} className="text-gray-400 hover:text-white">
+    <div className="min-h-screen bg-background text-foreground p-4 flex flex-col items-center">
+      <header className="w-full max-w-md flex justify-between items-center mb-6">
+        <Button variant="ghost" size="icon" onClick={() => navigate('/')} className="text-muted-foreground hover:text-foreground transition-colors duration-200">
           <ArrowLeft className="h-6 w-6" />
         </Button>
-        <h1 className="text-3xl font-bold">Archived Habits</h1>
+        <h1 className="text-3xl font-bold text-foreground">Archived Habits</h1>
         <div className="w-6" /> {/* Placeholder for alignment */}
       </header>
 
-      <div className="space-y-4 mb-8">
+      <div className="w-full max-w-md space-y-4 mb-8">
         {archivedHabits.length === 0 ? (
-          <div className="text-center text-gray-400 mt-10">
+          <div className="text-center text-muted-foreground mt-10 p-4 bg-card border border-border rounded-lg shadow-md">
             <p className="text-lg mb-4">No archived habits.</p>
-            <Button onClick={() => navigate('/')} className="bg-blue-600 hover:bg-blue-700 text-white">
+            <Button onClick={() => navigate('/')} className="bg-primary hover:bg-primary/90 text-primary-foreground transition-colors duration-200">
               <ArrowLeft className="mr-2 h-4 w-4" /> Back to Dashboard
             </Button>
           </div>

@@ -74,15 +74,15 @@ const HabitForm: React.FC<HabitFormProps> = ({ initialData, onSubmit, isSubmitti
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 p-4 bg-gray-800/50 dark:bg-gray-900/50 rounded-lg shadow-lg">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 p-6 bg-card border border-border rounded-lg shadow-lg">
         <FormField
           control={form.control}
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-white">Habit Name</FormLabel>
+              <FormLabel className="text-foreground">Habit Name</FormLabel>
               <FormControl>
-                <Input placeholder="e.g., Drink Water" {...field} className="bg-gray-700 border-gray-600 text-white placeholder:text-gray-400" />
+                <Input placeholder="e.g., Drink Water" {...field} className="bg-input border-border text-foreground placeholder:text-muted-foreground focus-visible:ring-ring transition-colors duration-200" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -93,9 +93,9 @@ const HabitForm: React.FC<HabitFormProps> = ({ initialData, onSubmit, isSubmitti
           name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-white">Description (Optional)</FormLabel>
+              <FormLabel className="text-foreground">Description (Optional)</FormLabel>
               <FormControl>
-                <Textarea placeholder="e.g., Drink 8 glasses of water daily" {...field} className="bg-gray-700 border-gray-600 text-white placeholder:text-gray-400" />
+                <Textarea placeholder="e.g., Drink 8 glasses of water daily" {...field} className="bg-input border-border text-foreground placeholder:text-muted-foreground focus-visible:ring-ring transition-colors duration-200" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -106,7 +106,7 @@ const HabitForm: React.FC<HabitFormProps> = ({ initialData, onSubmit, isSubmitti
           name="icon"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-white">Icon</FormLabel>
+              <FormLabel className="text-foreground">Icon</FormLabel>
               <FormControl>
                 <IconPicker selectedIcon={field.value} onSelectIcon={field.onChange} />
               </FormControl>
@@ -119,7 +119,7 @@ const HabitForm: React.FC<HabitFormProps> = ({ initialData, onSubmit, isSubmitti
           name="color"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-white">Color</FormLabel>
+              <FormLabel className="text-foreground">Color</FormLabel>
               <FormControl>
                 <ColorPicker selectedColor={field.value} onSelectColor={field.onChange} />
               </FormControl>
@@ -133,17 +133,17 @@ const HabitForm: React.FC<HabitFormProps> = ({ initialData, onSubmit, isSubmitti
             name="goalType"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-white">Goal Type</FormLabel>
+                <FormLabel className="text-foreground">Goal Type</FormLabel>
                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                   <FormControl>
-                    <SelectTrigger className="bg-gray-700 border-gray-600 text-white">
+                    <SelectTrigger className="bg-input border-border text-foreground focus:ring-ring transition-colors duration-200">
                       <SelectValue placeholder="Select goal type" />
                     </SelectTrigger>
                   </FormControl>
-                  <SelectContent className="bg-gray-800 border-gray-700 text-white">
-                    <SelectItem value="daily">Daily</SelectItem>
-                    <SelectItem value="weekly">Weekly</SelectItem>
-                    <SelectItem value="monthly">Monthly</SelectItem>
+                  <SelectContent className="bg-popover border-border text-foreground shadow-lg">
+                    <SelectItem value="daily" className="hover:bg-accent hover:text-accent-foreground">Daily</SelectItem>
+                    <SelectItem value="weekly" className="hover:bg-accent hover:text-accent-foreground">Weekly</SelectItem>
+                    <SelectItem value="monthly" className="hover:bg-accent hover:text-accent-foreground">Monthly</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />
@@ -155,9 +155,9 @@ const HabitForm: React.FC<HabitFormProps> = ({ initialData, onSubmit, isSubmitti
             name="goalValue"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-white">Goal Value</FormLabel>
+                <FormLabel className="text-foreground">Goal Value</FormLabel>
                 <FormControl>
-                  <Input type="number" {...field} className="bg-gray-700 border-gray-600 text-white" />
+                  <Input type="number" {...field} className="bg-input border-border text-foreground focus-visible:ring-ring transition-colors duration-200" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -166,7 +166,7 @@ const HabitForm: React.FC<HabitFormProps> = ({ initialData, onSubmit, isSubmitti
         </div>
 
         <FormItem>
-          <FormLabel className="text-white">Reminders</FormLabel>
+          <FormLabel className="text-foreground">Reminders</FormLabel>
           <div className="space-y-2">
             {reminders.map((reminderTime, index) => (
               <div key={index} className="flex items-center space-x-2">
@@ -174,27 +174,27 @@ const HabitForm: React.FC<HabitFormProps> = ({ initialData, onSubmit, isSubmitti
                   type="time"
                   value={reminderTime}
                   onChange={(e) => updateReminder(index, e.target.value)}
-                  className="bg-gray-700 border-gray-600 text-white"
+                  className="bg-input border-border text-foreground focus-visible:ring-ring transition-colors duration-200"
                 />
                 <Button
                   type="button"
                   variant="ghost"
                   size="icon"
                   onClick={() => removeReminder(index)}
-                  className="text-red-400 hover:text-red-300"
+                  className="text-destructive hover:text-destructive/80 transition-colors duration-200"
                 >
                   <MinusCircle className="h-5 w-5" />
                 </Button>
               </div>
             ))}
-            <Button type="button" variant="outline" onClick={addReminder} className="w-full bg-gray-700 border-gray-600 text-white hover:bg-gray-600">
+            <Button type="button" variant="outline" onClick={addReminder} className="w-full bg-secondary border-border text-secondary-foreground hover:bg-secondary/80 transition-colors duration-200">
               <PlusCircle className="mr-2 h-4 w-4" /> Add Reminder
             </Button>
           </div>
           <FormMessage>{form.formState.errors.reminders?.message}</FormMessage>
         </FormItem>
 
-        <Button type="submit" disabled={isSubmitting} className="w-full bg-blue-600 hover:bg-blue-700 text-white">
+        <Button type="submit" disabled={isSubmitting} className="w-full bg-primary hover:bg-primary/90 text-primary-foreground transition-colors duration-200">
           {isSubmitting ? 'Saving...' : 'Save Habit'}
         </Button>
       </form>

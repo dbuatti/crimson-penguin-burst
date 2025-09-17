@@ -20,15 +20,15 @@ const ColorPicker: React.FC<ColorPickerProps> = ({ selectedColor, onSelectColor 
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="outline" className="w-full justify-start text-left font-normal bg-gray-700 border-gray-600 text-white hover:bg-gray-600">
+        <Button variant="outline" className="w-full justify-start text-left font-normal bg-input border-border text-foreground hover:bg-accent hover:text-accent-foreground transition-colors duration-200">
           <div
-            className="mr-2 h-4 w-4 rounded-full border border-gray-400"
+            className="mr-2 h-4 w-4 rounded-full border border-border"
             style={{ backgroundColor: selectedColor }}
           />
           {selectedColor || "Select Color"}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[300px] p-2 bg-gray-800 border-gray-700">
+      <PopoverContent className="w-[300px] p-2 bg-popover border-border shadow-lg">
         <div className="grid grid-cols-5 gap-2">
           {availableColors.map((color) => (
             <Button
@@ -37,8 +37,8 @@ const ColorPicker: React.FC<ColorPickerProps> = ({ selectedColor, onSelectColor 
               size="icon"
               onClick={() => onSelectColor(color)}
               className={cn(
-                "h-8 w-8 rounded-full border-2",
-                selectedColor === color ? "border-white ring-2 ring-offset-2 ring-offset-gray-800" : "border-transparent"
+                "h-8 w-8 rounded-full border-2 transition-all duration-150",
+                selectedColor === color ? "border-primary ring-2 ring-offset-2 ring-offset-popover" : "border-transparent hover:scale-105"
               )}
               style={{ backgroundColor: color }}
             />
