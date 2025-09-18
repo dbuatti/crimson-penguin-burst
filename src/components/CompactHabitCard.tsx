@@ -1,7 +1,7 @@
 import React from 'react';
 import { Habit } from '@/types/habit';
 import { Card, CardContent } from '@/components/ui/card';
-import * as LucideIcons from 'lucide-react';
+import * => LucideIcons from 'lucide-react';
 import { Circle } from 'lucide-react';
 import CompactHabitGrid from './CompactHabitGrid';
 
@@ -23,7 +23,8 @@ const CompactHabitCard: React.FC<CompactHabitCardProps> = ({ habit, completionDa
   const calculateLongestStreak = (dates: string[]): number => {
     if (dates.length === 0) return 0;
     
-    const sortedDates = dates.sort();
+    // Sort dates chronologically to correctly identify streaks
+    const sortedDates = [...dates].sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
     let longestStreak = 1;
     let currentStreak = 1;
     
@@ -31,14 +32,15 @@ const CompactHabitCard: React.FC<CompactHabitCardProps> = ({ habit, completionDa
       const currentDate = new Date(sortedDates[i]);
       const prevDate = new Date(sortedDates[i - 1]);
       const diffTime = currentDate.getTime() - prevDate.getTime();
-      const diffDays = diffTime / (1000 * 60 * 60 * 24);
-      
-      if (diffDays === 1) {
+      const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24)); // Round to handle potential floating point issues
+
+      if (diffDays === 1) { // Check for exactly one day difference for a consecutive streak
         currentStreak++;
         longestStreak = Math.max(longestStreak, currentStreak);
-      } else {
+      } else if (diffDays > 1) { // If there's a gap, reset the current streak
         currentStreak = 1;
       }
+      // If diffDays is 0, it's a duplicate entry for the same day, which doesn't break or extend a streak.
     }
     
     return longestStreak;
@@ -46,6 +48,11 @@ const CompactHabitCard: React.FC<CompactHabitCardProps> = ({ habit, completionDa
 
   const longestStreak = calculateLongestStreak(completionDates);
   const totalCompletions = completionDates.length;
+
+  // Debugging logs
+  console.log(`Habit: ${habit.name}`);
+  console.log(`  Completion Dates:`, completionDates);
+  console.log(`  Calculated Longest Streak:`, longestStreak);
 
   return (
     <Card className="w-full bg-card text-foreground border border-border rounded-xl shadow-sm">
