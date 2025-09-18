@@ -30,13 +30,13 @@ const CreateHabit: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground p-4 flex flex-col items-center">
-      <div className="w-full max-w-md flex justify-between items-center mb-6">
-        <Button variant="ghost" size="icon" onClick={() => navigate('/')} className="text-muted-foreground hover:text-foreground transition-colors duration-200">
-          <X className="h-6 w-6" />
+    <div className="min-h-screen bg-background text-foreground p-6 flex flex-col items-center">
+      <div className="w-full max-w-md flex justify-between items-center mb-8">
+        <Button variant="ghost" size="icon" onClick={() => navigate('/')} className="text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors duration-200 rounded-lg">
+          <X className="h-5 w-5" />
         </Button>
         <h1 className="text-2xl font-bold text-foreground">Create New Habit</h1>
-        <div className="w-6" /> {/* Placeholder for alignment */}
+        <div className="w-5" /> {/* Placeholder for alignment */}
       </div>
       <div className="w-full max-w-md">
         <HabitForm onSubmit={handleSubmit} isSubmitting={isSubmitting} />

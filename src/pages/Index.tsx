@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { exportHabits, importHabits } from '@/lib/data-management';
 import { useSession } from '@/components/SessionContextProvider';
-import { ThemeToggle } from '@/components/ThemeToggle'; // Import ThemeToggle
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 const Index = () => {
   const [habits, setHabits] = useState<Habit[]>([]);
@@ -96,26 +96,26 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground p-4 flex flex-col items-center">
+    <div className="min-h-screen bg-background text-foreground p-6 flex flex-col items-center">
       <div className="w-full max-w-md">
-        <header className="flex justify-between items-center mb-6">
-          <div className="flex items-center space-x-2"> {/* Group settings and theme toggle */}
+        <header className="flex justify-between items-center mb-8">
+          <div className="flex items-center space-x-2">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground transition-colors duration-200">
-                  <Settings className="h-6 w-6" />
+                <Button variant="ghost" size="icon" className="text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors duration-200 rounded-lg">
+                  <Settings className="h-5 w-5" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="bg-popover border-border text-foreground shadow-lg">
-                <DropdownMenuItem asChild className="hover:bg-accent hover:text-accent-foreground transition-colors duration-150">
-                  <Link to="/archived-habits" className="flex items-center">
+              <DropdownMenuContent align="start" className="bg-popover border-border text-foreground shadow-lg rounded-lg">
+                <DropdownMenuItem asChild className="hover:bg-accent hover:text-accent-foreground transition-colors duration-150 cursor-pointer rounded-md">
+                  <Link to="/archived-habits" className="flex items-center p-2">
                     <Archive className="mr-2 h-4 w-4" /> View Archived Habits
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={handleExport} className="flex items-center hover:bg-accent hover:text-accent-foreground transition-colors duration-150">
+                <DropdownMenuItem onClick={handleExport} className="flex items-center hover:bg-accent hover:text-accent-foreground transition-colors duration-150 cursor-pointer rounded-md">
                   <Download className="mr-2 h-4 w-4" /> Export Data
                 </DropdownMenuItem>
-                <DropdownMenuItem className="flex items-center relative hover:bg-accent hover:text-accent-foreground transition-colors duration-150">
+                <DropdownMenuItem className="flex items-center relative hover:bg-accent hover:text-accent-foreground transition-colors duration-150 cursor-pointer rounded-md">
                   <Upload className="mr-2 h-4 w-4" /> Import Data
                   <input
                     type="file"
@@ -125,29 +125,29 @@ const Index = () => {
                   />
                 </DropdownMenuItem>
                 {session && (
-                  <DropdownMenuItem onClick={handleLogout} className="flex items-center text-destructive hover:bg-destructive/10 hover:text-destructive transition-colors duration-150">
+                  <DropdownMenuItem onClick={handleLogout} className="flex items-center text-destructive hover:bg-destructive/10 hover:text-destructive transition-colors duration-150 cursor-pointer rounded-md">
                     <LogOut className="mr-2 h-4 w-4" /> Logout
                   </DropdownMenuItem>
                 )}
               </DropdownMenuContent>
             </DropdownMenu>
-            <ThemeToggle /> {/* Add ThemeToggle here */}
+            <ThemeToggle />
           </div>
 
-          <h1 className="text-3xl font-bold text-foreground">HabitKit</h1>
+          <h1 className="text-4xl font-extrabold text-foreground tracking-tight">HabitKit</h1>
           <Link to="/create-habit">
-            <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground transition-colors duration-200">
-              <Plus className="h-6 w-6" />
+            <Button variant="ghost" size="icon" className="text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors duration-200 rounded-lg">
+              <Plus className="h-5 w-5" />
             </Button>
           </Link>
         </header>
 
         <div className="space-y-4 mb-8">
           {habits.length === 0 ? (
-            <div className="text-center text-muted-foreground mt-10 p-4 bg-card border border-border rounded-lg shadow-md">
+            <div className="text-center text-muted-foreground mt-12 p-6 bg-card border border-border rounded-xl shadow-lg">
               <p className="text-lg mb-4">No habits yet. Start by creating one!</p>
               <Link to="/create-habit">
-                <Button className="bg-primary hover:bg-primary/90 text-primary-foreground transition-colors duration-200">
+                <Button className="bg-primary hover:bg-primary/90 text-primary-foreground transition-colors duration-200 rounded-lg">
                   <Plus className="mr-2 h-4 w-4" /> Create First Habit
                 </Button>
               </Link>

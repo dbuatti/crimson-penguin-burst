@@ -31,11 +31,11 @@ const HabitGrid: React.FC<HabitGridProps> = ({
   let currentMonth: string | null = null;
 
   return (
-    <div className="p-3 rounded-md bg-secondary border border-border overflow-hidden">
+    <div className="p-4 rounded-xl bg-secondary border border-border overflow-hidden">
       {/* Day labels */}
       <div className="grid grid-cols-7 gap-1 mb-2">
         {WEEK_DAYS.map((day) => (
-          <div key={day} className="flex items-center justify-center text-xs font-medium text-muted-foreground w-6 h-6">
+          <div key={day} className="flex items-center justify-center text-xs font-medium text-muted-foreground w-7 h-7">
             {day}
           </div>
         ))}
@@ -52,7 +52,7 @@ const HabitGrid: React.FC<HabitGridProps> = ({
           const dayOfMonth = format(date, 'd');
           const monthAbbr = format(date, 'MMM').toUpperCase();
 
-          const showMonthDelineator = currentMonth !== monthAbbr;
+          const showMonthDelineator = index % 7 === 0 && currentMonth !== monthAbbr;
           if (showMonthDelineator) {
             currentMonth = monthAbbr;
           }
@@ -60,18 +60,18 @@ const HabitGrid: React.FC<HabitGridProps> = ({
           return (
             <React.Fragment key={index}>
               {showMonthDelineator && (
-                <div className="col-span-7 text-left text-xs font-bold text-foreground mt-2 mb-1 pl-1">
+                <div className="col-span-7 text-left text-xs font-bold text-foreground mt-3 mb-1 pl-1">
                   {monthAbbr}
                 </div>
               )}
               <div
-                className="relative w-6 h-6"
+                className="relative w-7 h-7"
               >
                 <button
                   type="button"
                   onClick={() => onToggleCompletion(dateFormatted)}
                   className={cn(
-                    "w-full h-full rounded-sm flex items-center justify-center text-[10px] font-semibold transition-all duration-200",
+                    "w-full h-full rounded-md flex items-center justify-center text-[10px] font-semibold transition-all duration-200",
                     "focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary",
                     {
                       "bg-muted text-muted-foreground hover:brightness-110": isPast && !isCompleted,

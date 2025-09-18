@@ -54,12 +54,12 @@ const IconPicker: React.FC<IconPickerProps> = ({ selectedIcon, onSelectIcon }) =
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="outline" className="w-full justify-start text-left font-normal bg-input border-border text-foreground hover:bg-accent hover:text-accent-foreground transition-colors duration-200">
+        <Button variant="outline" className="w-full justify-start text-left font-normal bg-input border-border text-foreground hover:bg-accent hover:text-accent-foreground transition-colors duration-200 rounded-lg">
           {SelectedIconComponent && <SelectedIconComponent className="mr-2 h-4 w-4 text-muted-foreground" />}
           {selectedIcon || "Select Icon"}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[300px] p-2 bg-popover border-border shadow-lg">
+      <PopoverContent className="w-[300px] p-3 bg-popover border-border shadow-lg rounded-xl">
         <div className="grid grid-cols-6 gap-1">
           {availableIcons.map((iconName) => {
             const IconComponent = (LucideIcons as any)[iconName];
@@ -70,11 +70,11 @@ const IconPicker: React.FC<IconPickerProps> = ({ selectedIcon, onSelectIcon }) =
                 size="icon"
                 onClick={() => onSelectIcon(iconName)}
                 className={cn(
-                  "h-8 w-8 text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors duration-150",
+                  "h-9 w-9 text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors duration-150 rounded-md",
                   selectedIcon === iconName && "bg-primary text-primary-foreground hover:bg-primary/90"
                 )}
               >
-                {IconComponent && <IconComponent className="h-4 w-4" />}
+                {IconComponent && <IconComponent className="h-5 w-5" />}
               </Button>
             );
           })}

@@ -47,20 +47,20 @@ const ArchivedHabits: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground p-4 flex flex-col items-center">
-      <header className="w-full max-w-md flex justify-between items-center mb-6">
-        <Button variant="ghost" size="icon" onClick={() => navigate('/')} className="text-muted-foreground hover:text-foreground transition-colors duration-200">
-          <ArrowLeft className="h-6 w-6" />
+    <div className="min-h-screen bg-background text-foreground p-6 flex flex-col items-center">
+      <header className="w-full max-w-md flex justify-between items-center mb-8">
+        <Button variant="ghost" size="icon" onClick={() => navigate('/')} className="text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors duration-200 rounded-lg">
+          <ArrowLeft className="h-5 w-5" />
         </Button>
-        <h1 className="text-3xl font-bold text-foreground">Archived Habits</h1>
-        <div className="w-6" /> {/* Placeholder for alignment */}
+        <h1 className="text-2xl font-bold text-foreground">Archived Habits</h1>
+        <div className="w-5" /> {/* Placeholder for alignment */}
       </header>
 
       <div className="w-full max-w-md space-y-4 mb-8">
         {archivedHabits.length === 0 ? (
-          <div className="text-center text-muted-foreground mt-10 p-4 bg-card border border-border rounded-lg shadow-md">
+          <div className="text-center text-muted-foreground mt-12 p-6 bg-card border border-border rounded-xl shadow-md">
             <p className="text-lg mb-4">No archived habits.</p>
-            <Button onClick={() => navigate('/')} className="bg-primary hover:bg-primary/90 text-primary-foreground transition-colors duration-200">
+            <Button onClick={() => navigate('/')} className="bg-primary hover:bg-primary/90 text-primary-foreground transition-colors duration-200 rounded-lg">
               <ArrowLeft className="mr-2 h-4 w-4" /> Back to Dashboard
             </Button>
           </div>
@@ -70,7 +70,7 @@ const ArchivedHabits: React.FC = () => {
               key={habit.id}
               habit={habit}
               onHabitUpdate={handleHabitUpdate}
-              onArchiveHabit={handleUnarchiveHabit} // Pass unarchive function
+              onArchiveHabit={handleUnarchiveHabit}
               onDeleteHabit={handleDeleteHabit}
             />
           ))
