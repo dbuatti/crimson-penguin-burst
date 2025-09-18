@@ -37,6 +37,10 @@ const History: React.FC = () => {
   const [totalCompletions, setTotalCompletions] = useState(0);
   const [longestStreakEver, setLongestStreakEver] = useState(0);
   const [currentLongestStreak, setCurrentLongestStreak] = useState(0);
+  const [longestStreakIcon, setLongestStreakIcon] = useState<string | undefined>(undefined);
+  const [longestStreakColor, setLongestStreakColor] = useState<string | undefined>(undefined);
+  const [currentLongestStreakIcon, setCurrentLongestStreakIcon] = useState<string | undefined>(undefined);
+  const [currentLongestStreakColor, setCurrentLongestStreakColor] = useState<string | undefined>(undefined);
 
   // Daily Chart State
   const [dailyChartData, setDailyChartData] = useState<ChartDataPoint[]>([]);
@@ -74,15 +78,31 @@ const History: React.FC = () => {
       const total = allLogs.length;
       setTotalCompletions(total);
 
-      const { longestStreakEver: overallLongest, currentLongestStreak: overallCurrent } = calculateOverallStreaks(allLogs, allHabits);
+      const {
+        longestStreakEver: overallLongest,
+        currentLongestStreak: overallCurrent,
+        longestStreakHabitIcon,
+        longestStreakHabitColor,
+        currentLongestStreakHabitIcon,
+        currentLongestStreakHabitColor,
+      } = calculateOverallStreaks(allLogs, allHabits);
+
       setLongestStreakEver(overallLongest);
       setCurrentLongestStreak(overallCurrent);
+      setLongestStreakIcon(longestStreakHabitIcon);
+      setLongestStreakColor(longestStreakHabitColor);
+      setCurrentLongestStreakIcon(currentLongestStreakHabitIcon);
+      setCurrentLongestStreakColor(currentLongestStreakHabitColor);
 
     } else {
       setHabitsHistory([]);
       setTotalCompletions(0);
       setLongestStreakEver(0);
       setCurrentLongestStreak(0);
+      setLongestStreakIcon(undefined);
+      setLongestStreakColor(undefined);
+      setCurrentLongestStreakIcon(undefined);
+      setCurrentLongestStreakColor(undefined);
     }
     setIsLoading(false);
   }, [session]);
@@ -211,7 +231,7 @@ const History: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground p-6 flex flex-col items-center w-full max-w-4xl"> {/* Added max-w-4xl here */}
+    <div className="min-h-screen bg-background text-foreground p-6 flex flex-col items-center w-full max-w-4xl">
       <div className="flex items-center justify-center p-1 bg-secondary rounded-full shadow-inner border border-border mb-6 w-full">
         {tabs.map((tab) => {
           const IconComponent = tab.icon;
@@ -234,7 +254,7 @@ const History: React.FC = () => {
       </div>
 
       {activeTab === 'habits' && (
-        <div className="w-full space-y-3">
+        <div className="w-full max-w-4xl space-y-3">
           {habitsHistory.length === 0 ? (
             <div className="text-center text-muted-foreground p-8 bg-card border border-border rounded-xl shadow-lg flex flex-col items-center justify-center">
               <Sparkles className="h-12 w-12 text-primary mb-4" />
@@ -254,11 +274,15 @@ const History: React.FC = () => {
       )}
 
       {activeTab === 'statistics' && (
-        <div className="w-full space-y-6">
+        <div className="w-full max-w-4xl space-y-6">
           <OverallStatsCards
             totalCompletions={totalCompletions}
             longestStreakEver={longestStreakEver}
             currentLongestStreak={currentLongestStreak}
+            longestStreakIcon={longestStreakIcon}
+            longestStreakColor={longestStreakColor}
+            currentLongestStreakIcon={currentLongestStreakIcon}
+            currentLongestStreakColor={currentLongestStreakColor}
           />
 
           <HabitCompletionChart
@@ -300,7 +324,7 @@ const History: React.FC = () => {
       )}
 
       {activeTab === 'archived' && (
-        <div className="w-full space-y-6">
+        <div className="w-full max-w-4xl space-y-6">
           <div className="bg-card border border-border rounded-xl shadow-lg p-6">
             <h2 className="text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
               <Archive className="h-5 w-5" />
