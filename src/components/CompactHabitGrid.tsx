@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { format, addDays, subDays } from 'date-fns';
-import { useIsMobile } from '@/hooks/use-mobile'; // Import the useIsMobile hook
 
 interface CompactHabitGridProps {
   completionDates: string[];
@@ -21,12 +20,9 @@ const CompactHabitGrid: React.FC<CompactHabitGridProps> = ({
 }) => {
   const [numDotColumns, setNumDotColumns] = useState(0); // Number of columns for the dot grid
   const containerRef = useRef<HTMLDivElement>(null); // Ref for the container div
-  const isMobile = useIsMobile(); // Use the mobile detection hook
 
   const calculateGridDimensions = useCallback(() => {
-    if (isMobile) {
-      setNumDotColumns(7); // Fixed 7 columns for mobile
-    } else if (containerRef.current) {
+    if (containerRef.current) {
       const currentContainerWidth = containerRef.current.clientWidth;
       
       // Calculate how many dots can fit horizontally
@@ -35,7 +31,7 @@ const CompactHabitGrid: React.FC<CompactHabitGridProps> = ({
       const calculatedColumns = Math.floor(effectiveWidthForDots / DOT_SIZE_PX);
       setNumDotColumns(Math.max(1, calculatedColumns)); // Ensure at least 1 column
     }
-  }, [isMobile]); // Recalculate if isMobile changes
+  }, []);
 
   useEffect(() => {
     calculateGridDimensions(); // Set initial value
