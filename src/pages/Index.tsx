@@ -4,7 +4,7 @@ import { getHabits, updateHabit, deleteHabit } from '@/lib/habit-storage';
 import { Habit } from '@/types/habit';
 import HabitCard from '@/components/HabitCard';
 import { MadeWithDyad } from "@/components/made-with-dyad";
-import { Plus, Settings, Archive, Upload, Download, LogOut } from 'lucide-react';
+import { Plus, Settings, Archive, Upload, Download, LogOut, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { showSuccess, showError } from '@/utils/toast';
 import {
@@ -69,7 +69,6 @@ const Index = () => {
 
   const handleExport = async () => {
     await exportHabits(session);
-    // The toast for export success is now handled within exportHabits itself.
   };
 
   const handleImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -77,7 +76,6 @@ const Index = () => {
     if (file) {
       try {
         await importHabits(file, session);
-        // The toast for import success/failure is now handled within importHabits itself.
         fetchHabits();
       } catch (error) {
         console.error('Failed to import habits:', error);
@@ -93,10 +91,9 @@ const Index = () => {
     } else {
       showSuccess('Logged out successfully!');
     }
-    // Explicitly clear Supabase auth token from local storage
     localStorage.removeItem('sb-gdmjttmjjhadltaihpgr-auth-token');
     navigate('/login');
-    window.location.reload(); // Force a full page reload
+    window.location.reload();
   };
 
   if (sessionLoading) {
@@ -109,8 +106,8 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground p-6 flex flex-col items-center">
-      <div className="w-full max-w-md">
-        <header className="flex justify-between items-center mb-8">
+      <div className="w-full max-w-4xl"> {/* Increased max-w for wider grid */}
+        <header className="flex justify-between items-center mb-8 py-2 px-4 bg-card border border-border rounded-xl shadow-lg">
           <div className="flex items-center space-x-2">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -146,7 +143,7 @@ const Index = () => {
             <ThemeToggle />
           </div>
 
-          <h1 className="text-4xl font-extrabold text-foreground tracking-tight">HabitKit</h1>
+          <h1 className="text-3xl md:text-4xl font-extrabold text-foreground tracking-tight">HabitKit</h1>
           <Link to="/create-habit">
             <Button variant="ghost" size="icon" className="text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors duration-200 rounded-lg">
               <Plus className="h-5 w-5" />
@@ -154,13 +151,14 @@ const Index = () => {
           </Link>
         </header>
 
-        <div className="space-y-4 mb-8">
+        <div className="space-y-4 mb-8 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-4 md:space-y-0">
           {habits.length === 0 ? (
-            <div className="text-center text-muted-foreground mt-12 p-6 bg-card border border-border rounded-xl shadow-lg">
-              <p className="text-lg mb-4">No habits yet. Start by creating one!</p>
+            <div className="md:col-span-2 lg:col-span-3 text-center text-muted-foreground mt-12 p-8 bg-card border border-border rounded-xl shadow-lg flex flex-col items-center justify-center">
+              <Sparkles className="h-12 w-12 text-primary mb-4" />
+              <p className="text-xl font-semibold mb-4">No habits yet. Let's build some good routines!</p>
               <Link to="/create-habit">
-                <Button className="bg-primary hover:bg-primary/90 text-primary-foreground transition-colors duration-200 rounded-lg">
-                  <Plus className="mr-2 h-4 w-4" /> Create First Habit
+                <Button className="bg-primary hover:bg-primary/90 text-primary-foreground transition-colors duration-200 rounded-lg px-6 py-3 text-base">
+                  <Plus className="mr-2 h-4 w-4" /> Create Your First Habit
                 </Button>
               </Link>
             </div>

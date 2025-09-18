@@ -57,7 +57,7 @@
     --popover-foreground: 210 20% 98%;
 
     --primary: 210 70% 50%; /* Same calming blue */
-    --primary-foreground: 0 0% 100%;
+    --primary-foreground: 210 20% 98%; /* Changed to off-white for consistency */
 
     --secondary: 220 13% 25%; /* Darker gray for secondary elements */
     --secondary-foreground: 210 20% 98%;
