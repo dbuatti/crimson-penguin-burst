@@ -4,7 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import * as LucideIcons from 'lucide-react';
 import { Circle } from 'lucide-react';
 import CompactHabitGrid from './CompactHabitGrid';
-import { format, subDays, isSameDay } from 'date-fns';
+import { addDays, isSameDay, subDays, format } from 'date-fns';
 
 interface CompactHabitCardProps {
   habit: Habit;
@@ -28,23 +28,23 @@ const CompactHabitCard: React.FC<CompactHabitCardProps> = ({ habit, completionDa
     const sortedDates = [...dates].sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
     
     let longestStreak = 0;
-    let tempCurrentStreakForLongest = 0; // Renamed for clarity and to fix undeclared variable
+    let currentStreak = 0;
+    let tempCurrentStreak = 0;
 
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // Normalize today to start of day
+    today.setHours(0, 0, 0, 0); // Normalize to start of day
 
-    // Convert sortedDates to Date objects for easier comparison and use a Set for quick lookup
+    // Convert sortedDates to Date objects for easier comparison
     const dateObjects = sortedDates.map(d => {
       const date = new Date(d);
       date.setHours(0, 0, 0, 0);
       return date;
     });
-    const formattedDatesSet = new Set(dates); // For efficient lookup of completion dates
 
     // Calculate longest streak
     if (dateObjects.length > 0) {
-      tempCurrentStreakForLongest = 1;
       longestStreak = 1;
+      tempCurrentStreak = 1; // Use tempCurrentStreak for longest streak calculation
     }
     
     for (let i = 1; i < dateObjects.length; i++) {
@@ -53,47 +53,53 @@ const CompactHabitCard: React.FC<CompactHabitCardProps> = ({ habit, completionDa
 
       if (isNaN(currentDate.getTime()) || isNaN(prevDate.getTime())) {
         console.warn(`Invalid date found in completionDates for habit ${habit.name}: ${sortedDates[i-1]}, ${sortedDates[i]}`);
-        tempCurrentStreakForLongest = 0;
+        tempCurrentStreak = 0;
         continue;
       }
 
       const diffTime = currentDate.getTime() - prevDate.getTime();
       const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
 
-      if (diffDays === 1) { // Consecutive day
-        tempCurrentStreakForLongest++;
-        longestStreak = Math.max(longestStreak, tempCurrentStreakForLongest);
-      } else if (diffDays > 1) { // Gap, reset streak
-        tempCurrentStreakForLongest = 1;
+      if (diffDays === 1) {
+        tempCurrentStreak++;
+        longestStreak = Math.max(longestStreak, tempCurrentStreak);
+      } else if (diffDays > 1) {
+        tempCurrentStreak = 1;
       }
-      // If diffDays is 0, it's a duplicate entry for the same day, which doesn't break or extend a streak.
     }
 
-    // Calculate current streak (from today backwards)
-    let currentStreak = 0; // Ensure this is 'let'
-    let checkDateForCurrentStreak = today; // Use a distinct variable name for clarity
+    // Calculate current streak
+    // Start from today and go backwards
+    let checkDate = today;
+    let consecutiveDays = 0;
+    let foundTodayOrYesterday = false;
 
     // Check if today is completed
-    if (formattedDatesSet.has(format(today, 'yyyy-MM-dd'))) {
-      currentStreak = 1;
-      checkDateForCurrentStreak = subDays(today, 1);
-    } else if (formattedDatesSet.has(format(subDays(today, 1), 'yyyy-MM-dd'))) {
-      // If today is not completed, but yesterday was, the streak starts from yesterday
-      currentStreak = 1;
-      checkDateForCurrentStreak = subDays(today, 2);
+    if (dates.includes(format(today, 'yyyy-MM-dd'))) {
+      consecutiveDays = 1;
+      checkDate = subDays(today, 1);
+      foundTodayOrYesterday = true;
+    } else if (dates.includes(format(subDays(today, 1), 'yyyy-MM-dd'))) {
+      // If today is not completed, check if yesterday was
+      consecutiveDays = 1;
+      checkDate = subDays(today, 2);
+      foundTodayOrYesterday = true;
     } else {
       // If neither today nor yesterday was completed, current streak is 0
-      return { longestStreak, currentStreak: 0 };
+      currentStreak = 0;
     }
 
-    while (true) {
-      const formattedCheckDate = format(checkDateForCurrentStreak, 'yyyy-MM-dd');
-      if (formattedDatesSet.has(formattedCheckDate)) {
-        currentStreak++;
-        checkDateForCurrentStreak = subDays(checkDateForCurrentStreak, 1);
-      } else {
-        break;
+    if (foundTodayOrYesterday) {
+      while (true) {
+        const formattedCheckDate = format(checkDate, 'yyyy-MM-dd');
+        if (dates.includes(formattedCheckDate)) {
+          consecutiveDays++;
+          checkDate = subDays(checkDate, 1);
+        } else {
+          break;
+        }
       }
+      currentStreak = consecutiveDays;
     }
 
     return { longestStreak, currentStreak };
@@ -131,13 +137,13 @@ const CompactHabitCard: React.FC<CompactHabitCardProps> = ({ habit, completionDa
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center space-x-4">
             <div className="text-xs text-muted-foreground">
-              <span className="font-medium text-foreground">Current:</span> {currentStreak} <span className="text-muted-foreground">(current streak)</span>
+              <span className="font-medium text-foreground">Current:</span> {currentStreak}
             </div>
             <div className="text-xs text-muted-foreground">
-              <span className="font-medium text-foreground">Longest:</span> {longestStreak} <span className="text-muted-foreground">(longest held streak)</span>
+              <span className="font-medium text-foreground">Longest:</span> {longestStreak}
             </div>
             <div className="text-xs text-muted-foreground">
-              <span className="font-medium text-foreground">Completed:</span> {totalCompletions} <span className="text-muted-foreground">(tally)</span>
+              <span className="font-medium text-foreground">Completed:</span> {totalCompletions}
             </div>
           </div>
         </div>
