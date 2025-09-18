@@ -28,14 +28,14 @@ const HabitGrid: React.FC<HabitGridProps> = ({
 
   return (
     <div className="p-3 rounded-md bg-secondary border border-border overflow-hidden">
-      {/* Day labels */}
-      <div className="grid grid-cols-7 gap-1 mb-2">
+      {/* Day labels - Removed */}
+      {/* <div className="grid grid-cols-7 gap-1 mb-2">
         {WEEK_DAYS.map((day) => (
           <div key={day} className="text-center text-xs font-medium text-muted-foreground">
             {day}
           </div>
         ))}
-      </div>
+      </div> */}
 
       {/* Habit completion grid */}
       <div className="grid grid-cols-7 gap-1">
