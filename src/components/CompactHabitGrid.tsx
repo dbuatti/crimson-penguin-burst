@@ -58,7 +58,7 @@ const CompactHabitGrid: React.FC<CompactHabitGridProps> = ({
   return (
     <div className="p-2 rounded-lg bg-secondary border border-border overflow-hidden">
       {/* Day labels */}
-      <div className="grid grid-cols-7 gap-1 mb-1">
+      <div className="grid grid-cols-7 mb-1"> {/* Removed gap-1 */}
         {WEEK_DAYS.map((day, index) => (
           <div key={index} className="flex items-center justify-center text-xs font-medium text-muted-foreground w-4 h-4">
             {day}
@@ -67,7 +67,7 @@ const CompactHabitGrid: React.FC<CompactHabitGridProps> = ({
       </div>
 
       {/* Habit completion grid */}
-      <div className="grid grid-cols-7 gap-1">
+      <div className="grid grid-cols-7"> {/* Removed gap-1 */}
         {dates.map((date, index) => {
           const dateFormatted = format(date, 'yyyy-MM-dd');
           const isCompleted = completionDates.includes(dateFormatted);
