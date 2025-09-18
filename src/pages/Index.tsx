@@ -11,19 +11,23 @@ import CircularProgress from '@/components/CircularProgress';
 
 const Index = () => {
   const [habits, setHabits] = useState<Habit[]>([]);
+  const [isLoadingHabits, setIsLoadingHabits] = useState(true); // New loading state for habits
   const { session, loading: sessionLoading } = useSession();
 
   const fetchHabits = useCallback(async () => {
     if (session) {
+      setIsLoadingHabits(true); // Set loading true before fetching
       const allHabits = await getHabits(session);
       setHabits(allHabits.filter(h => !h.archived));
+      setIsLoadingHabits(false); // Set loading false after fetching
     } else {
       setHabits([]);
+      setIsLoadingHabits(false); // Also set false if no session
     }
   }, [session]);
 
   useEffect(() => {
-    if (!sessionLoading) {
+    if (!sessionLoading) { // Only fetch habits once session loading is complete
       fetchHabits();
     }
   }, [fetchHabits, sessionLoading]);
@@ -98,7 +102,7 @@ const Index = () => {
   const completedDailyHabits = todayHabits.filter(h => h.isCompletedToday).length;
   const overallDailyProgress = totalDailyHabits > 0 ? Math.round((completedDailyHabits / totalDailyHabits) * 100) : 0;
 
-  if (sessionLoading) {
+  if (sessionLoading || isLoadingHabits) { // Show loading if either session or habits are loading
     return (
       <div className="min-h-screen bg-background text-foreground p-6 flex items-center justify-center">
         Loading...
@@ -109,7 +113,7 @@ const Index = () => {
   return (
     <>
       {habits.length === 0 ? (
-        <div className="text-center text-muted-foreground mt-6 p-8 bg-card border border-border rounded-xl shadow-lg flex flex-col items-center justify-center max-w-4xl"> {/* Changed max-w-2xl to max-w-4xl */}
+        <div className="text-center text-muted-foreground mt-6 p-8 bg-card border border-border rounded-xl shadow-lg flex flex-col items-center justify-center max-w-4xl">
           <Sparkles className="h-12 w-12 text-primary mb-4" />
           <p className="text-xl font-semibold mb-4">No habits yet. Let's build some good routines!</p>
           <Link to="/create-habit">
@@ -120,7 +124,7 @@ const Index = () => {
         </div>
       ) : (
         <>
-          <div className="w-full max-w-4xl flex items-center justify-between mt-4 mb-2"> {/* Changed max-w-2xl to max-w-4xl */}
+          <div className="w-full max-w-4xl flex items-center justify-between mt-4 mb-2">
             <h1 className="text-3xl font-extrabold text-foreground tracking-tight">Today</h1>
             <div className="flex space-x-2">
               <Link to="/create-habit">
@@ -131,7 +135,7 @@ const Index = () => {
             </div>
           </div>
 
-          <div className="flex justify-center mb-4 max-w-4xl w-full"> {/* Changed max-w-2xl to max-w-4xl */}
+          <div className="flex justify-center mb-4 max-w-4xl w-full">
             <div className="relative flex items-center justify-center">
               <CircularProgress
                 percentage={overallDailyProgress}
@@ -148,7 +152,7 @@ const Index = () => {
             </div>
           </div>
 
-          <div className="space-y-3 mb-4 w-full max-w-4xl"> {/* Changed max-w-2xl to max-w-4xl */}
+          <div className="space-y-3 mb-4 w-full max-w-4xl">
             {todayHabits.map((habit) => (
               <HabitListItem
                 key={habit.id}
@@ -165,8 +169,8 @@ const Index = () => {
 
           {weeklyMonthlyHabits.length > 0 && (
             <>
-              <h2 className="text-2xl font-extrabold text-foreground tracking-tight mb-4 mt-6 w-full max-w-4xl">Weekly goals</h2> {/* Changed max-w-2xl to max-w-4xl */}
-              <div className="space-y-3 mb-4 w-full max-w-4xl"> {/* Changed max-w-2xl to max-w-4xl */}
+              <h2 className="text-2xl font-extrabold text-foreground tracking-tight mb-4 mt-6 w-full max-w-4xl">Weekly goals</h2>
+              <div className="space-y-3 mb-4 w-full max-w-4xl">
                 {weeklyMonthlyHabits.map((habit) => (
                   <HabitListItem
                     key={habit.id}
