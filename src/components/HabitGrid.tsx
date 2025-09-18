@@ -5,6 +5,7 @@ import { format, startOfWeek, addDays, subWeeks, isSameDay, isFirstDayOfMonth } 
 interface HabitGridProps {
   completionDates: string[];
   habitColor: string;
+  onToggleCompletion: (dateString: string) => void; // New prop for toggling completion
 }
 
 const NUM_WEEKS_TO_SHOW = 7; // Display the last 7 weeks
@@ -12,6 +13,7 @@ const NUM_WEEKS_TO_SHOW = 7; // Display the last 7 weeks
 const HabitGrid: React.FC<HabitGridProps> = ({
   completionDates,
   habitColor,
+  onToggleCompletion, // Destructure the new prop
 }) => {
   const today = new Date();
   today.setHours(0, 0, 0, 0); // Normalize today to start of day
@@ -64,22 +66,25 @@ const HabitGrid: React.FC<HabitGridProps> = ({
               key={index}
               className="relative w-5 h-5" // Fixed size for the grid cell
             >
-              <div
+              <button
+                type="button" // Use button for semantic correctness and accessibility
+                onClick={() => onToggleCompletion(dateFormatted)} // Call the new prop on click
                 className={cn(
-                  "w-full h-full rounded-sm flex items-center justify-center transition-all duration-200", // Fill the parent div
+                  "w-full h-full rounded-sm flex items-center justify-center transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary", // Fill the parent div
                   {
                     "bg-accent": !isCompleted && !isPast, // Default for incomplete future/current days
                     "bg-muted": isPast && !isCompleted, // Distinct background for past incomplete days
                     "border border-primary/50": isCurrentDay && !isCompleted, // Highlight today with a subtle border if incomplete
-                    "opacity-50": isFuture, // Dim future dates
+                    "opacity-50 cursor-not-allowed": isFuture, // Dim future dates and disable clicks
                   }
                 )}
                 style={{ backgroundColor: isCompleted ? habitColor : undefined }}
+                disabled={isFuture} // Disable clicking on future dates
               >
                 <span className="text-[8px] font-bold text-foreground opacity-20">
                   {dayOfMonth}
                 </span>
-              </div>
+              </button>
             </div>
           );
         })}

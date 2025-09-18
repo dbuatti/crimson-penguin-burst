@@ -26,8 +26,8 @@ const HabitCard: React.FC<HabitCardProps> = ({ habit, onHabitUpdate, onArchiveHa
   const today = new Date().toISOString().split('T')[0];
   const isCompletedToday = habit.completionDates.includes(today);
 
-  const handleToggleCompletion = () => {
-    toggleHabitCompletion(habit.id, today);
+  const handleToggleCompletion = (dateString: string) => {
+    toggleHabitCompletion(habit.id, dateString);
     onHabitUpdate(); // Notify parent to re-fetch habits
   };
 
@@ -56,7 +56,7 @@ const HabitCard: React.FC<HabitCardProps> = ({ habit, onHabitUpdate, onArchiveHa
           <Checkbox
             id={`habit-${habit.id}`}
             checked={isCompletedToday}
-            onCheckedChange={handleToggleCompletion}
+            onCheckedChange={() => handleToggleCompletion(today)} // Use today's date for checkbox
             className="h-6 w-6 rounded-full border-2 transition-colors duration-200
                        data-[state=unchecked]:bg-secondary data-[state=unchecked]:border-border 
                        data-[state=checked]:text-primary-foreground"
@@ -96,7 +96,11 @@ const HabitCard: React.FC<HabitCardProps> = ({ habit, onHabitUpdate, onArchiveHa
         </div>
       </CardHeader>
       <CardContent className="p-4 pt-0">
-        <HabitGrid completionDates={habit.completionDates} habitColor={habit.color} />
+        <HabitGrid 
+          completionDates={habit.completionDates} 
+          habitColor={habit.color} 
+          onToggleCompletion={handleToggleCompletion} // Pass the new handler
+        />
       </CardContent>
     </Card>
   );
