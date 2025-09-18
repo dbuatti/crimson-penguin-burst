@@ -7,7 +7,8 @@ import CreateHabit from "./pages/CreateHabit";
 import EditHabit from "./pages/EditHabit";
 import HabitCalendar from "./pages/HabitCalendar";
 import ArchivedHabits from "./pages/ArchivedHabits";
-import History from "./pages/History"; // Import the new History page
+import History from "./pages/History";
+import Settings from "./pages/Settings"; // Import the new Settings page
 import Login from "./pages/Login";
 import { SessionContextProvider } from "./components/SessionContextProvider";
 import { ThemeProvider } from "./components/ThemeProvider";
@@ -17,7 +18,6 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme" attribute="class">
-      {/* Removed shadcn/ui Toaster, using Sonner exclusively */}
       <Sonner />
       <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <SessionContextProvider>
@@ -28,7 +28,8 @@ const App = () => (
             <Route path="/edit-habit/:id" element={<EditHabit />} />
             <Route path="/habit-calendar/:id" element={<HabitCalendar />} />
             <Route path="/archived-habits" element={<ArchivedHabits />} />
-            <Route path="/history" element={<History />} /> {/* Add the new History route */}
+            <Route path="/history" element={<History />} />
+            <Route path="/settings" element={<Settings />} /> {/* Add the new Settings route */}
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
