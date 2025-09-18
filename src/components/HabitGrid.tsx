@@ -18,7 +18,6 @@ const HabitGrid: React.FC<HabitGridProps> = ({
 }) => {
   const today = new Date();
   today.setHours(0, 0, 0, 0); // Normalize today to start of day
-  const todayFormatted = format(today, 'yyyy-MM-dd');
 
   const startOfCurrentWeek = startOfWeek(today, { weekStartsOn: 1 }); // Monday of the current week
   const gridStartDate = subWeeks(startOfCurrentWeek, NUM_WEEKS_TO_SHOW - 1);
@@ -28,7 +27,7 @@ const HabitGrid: React.FC<HabitGridProps> = ({
     dates.push(addDays(gridStartDate, i));
   }
 
-  let currentMonth: string | null = null;
+  let lastRenderedMonth: string | null = null;
 
   return (
     <div className="p-4 rounded-xl bg-secondary border border-border overflow-hidden">
@@ -50,18 +49,18 @@ const HabitGrid: React.FC<HabitGridProps> = ({
           const isFuture = date > today;
           const isCurrentDay = isSameDay(date, today);
           const dayOfMonth = format(date, 'd');
-          const monthAbbr = format(date, 'MMM').toUpperCase();
+          const currentMonthAbbr = format(date, 'MMM').toUpperCase();
 
-          const showMonthDelineator = index % 7 === 0 && currentMonth !== monthAbbr;
+          const showMonthDelineator = (index === 0 || !isSameMonth(date, addDays(date, -1))) && currentMonthAbbr !== lastRenderedMonth;
           if (showMonthDelineator) {
-            currentMonth = monthAbbr;
+            lastRenderedMonth = currentMonthAbbr;
           }
 
           return (
             <React.Fragment key={index}>
               {showMonthDelineator && (
                 <div className="col-span-7 text-left text-xs font-bold text-foreground mt-3 mb-1 pl-1">
-                  {monthAbbr}
+                  {currentMonthAbbr}
                 </div>
               )}
               <div
@@ -70,6 +69,7 @@ const HabitGrid: React.FC<HabitGridProps> = ({
                 <button
                   type="button"
                   onClick={() => onToggleCompletion(dateFormatted)}
+                  disabled={isFuture}
                   className={cn(
                     "w-full h-full rounded-md flex items-center justify-center text-[10px] font-semibold transition-all duration-200",
                     "focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary",
@@ -82,7 +82,7 @@ const HabitGrid: React.FC<HabitGridProps> = ({
                     }
                   )}
                   style={{ backgroundColor: isCompleted ? habitColor : undefined }}
-                  disabled={isFuture}
+                  aria-label={`${isCompleted ? 'Completed' : 'Not completed'} ${format(date, 'EEEE, MMMM d, yyyy')}`}
                 >
                   {dayOfMonth}
                 </button>
