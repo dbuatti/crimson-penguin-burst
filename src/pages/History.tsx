@@ -1,16 +1,24 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { getHabits, getHabitCompletionLogs } from '@/lib/habit-storage';
+import { getHabits, getHabitCompletionLogs, getAllHabitLogs, getDailyHabitCompletionSummary, getWeeklyHabitCompletionSummary } from '@/lib/habit-storage';
 import { Habit } from '@/types/habit';
 import { useSession } from '@/components/SessionContextProvider';
 import CompactHabitCard from '@/components/CompactHabitCard';
-import { Sparkles, BarChart3, Archive, TrendingUp, Calendar, Target } from 'lucide-react';
+import { Sparkles, BarChart3, Archive, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
-import { cn } from '@/lib/utils';
+import { cn, calculateOverallStreaks } from '@/lib/utils';
+import OverallStatsCards from '@/components/OverallStatsCards';
+import HabitCompletionChart from '@/components/HabitCompletionChart';
+import { format, subDays, addDays, subWeeks, addWeeks, subMonths, addMonths, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfDay, endOfDay } from 'date-fns';
 
 interface HabitHistory {
   habit: Habit;
   completionDates: string[];
+}
+
+interface ChartDataPoint {
+  date: string;
+  value: number;
 }
 
 const History: React.FC = () => {
@@ -19,10 +27,28 @@ const History: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'habits' | 'statistics' | 'archived'>('habits');
   const { session, loading: sessionLoading } = useSession();
 
+  // Overall Stats
+  const [totalCompletions, setTotalCompletions] = useState(0);
+  const [longestStreakEver, setLongestStreakEver] = useState(0);
+  const [currentLongestStreak, setCurrentLongestStreak] = useState(0);
+
+  // Daily Chart State
+  const [dailyChartData, setDailyChartData] = useState<ChartDataPoint[]>([]);
+  const [dailyAvgPercentage, setDailyAvgPercentage] = useState(0);
+  const [dailyTimeRange, setDailyTimeRange] = useState('31D'); // Default to 31 days
+  const [dailyDateOffset, setDailyDateOffset] = useState(0); // Offset in days/weeks/months
+
+  // Weekly Chart State
+  const [weeklyChartData, setWeeklyChartData] = useState<ChartDataPoint[]>([]);
+  const [weeklyAvgPercentage, setWeeklyAvgPercentage] = useState(0);
+  const [weeklyTimeRange, setWeeklyTimeRange] = useState('16W'); // Default to 16 weeks
+  const [weeklyDateOffset, setWeeklyDateOffset] = useState(0); // Offset in weeks/months
+
   const fetchHabitsAndHistory = useCallback(async () => {
     if (session) {
       const allHabits = await getHabits(session);
       const activeHabits = allHabits.filter(h => !h.archived);
+      const archivedHabits = allHabits.filter(h => h.archived);
 
       const historyPromises = activeHabits.map(async (habit) => {
         const completionDates = await getHabitCompletionLogs(habit.id, session);
@@ -31,23 +57,141 @@ const History: React.FC = () => {
 
       const results = await Promise.all(historyPromises);
       setHabitsHistory(results);
+
+      // Calculate overall stats
+      const allLogs = await getAllHabitLogs(session);
+      const total = allLogs.length;
+      setTotalCompletions(total);
+
+      const { longestStreakEver: overallLongest, currentLongestStreak: overallCurrent } = calculateOverallStreaks(allLogs, allHabits);
+      setLongestStreakEver(overallLongest);
+      setCurrentLongestStreak(overallCurrent);
+
     } else {
       setHabitsHistory([]);
+      setTotalCompletions(0);
+      setLongestStreakEver(0);
+      setCurrentLongestStreak(0);
     }
     setIsLoading(false);
   }, [session]);
 
+  const fetchDailyChartData = useCallback(async () => {
+    if (!session) return;
+
+    let daysToFetch = 30; // Default for 31D
+    let startDate = startOfDay(new Date());
+    let endDate = endOfDay(new Date());
+
+    if (dailyTimeRange === '7D') {
+      daysToFetch = 7;
+    } else if (dailyTimeRange === '31D') {
+      daysToFetch = 30;
+    } else if (dailyTimeRange === '26W') { // Approx 6 months
+      daysToFetch = 26 * 7;
+    } else if (dailyTimeRange === '12M') { // Approx 1 year
+      daysToFetch = 365;
+    }
+
+    // Adjust date range based on offset
+    if (dailyDateOffset !== 0) {
+      if (dailyTimeRange === '7D') {
+        startDate = subDays(startDate, daysToFetch * dailyDateOffset);
+        endDate = addDays(startDate, daysToFetch - 1);
+      } else if (dailyTimeRange === '31D') {
+        startDate = subDays(startDate, daysToFetch * dailyDateOffset);
+        endDate = addDays(startDate, daysToFetch - 1);
+      } else if (dailyTimeRange === '26W') {
+        startDate = subWeeks(startDate, Math.abs(dailyDateOffset) * 26);
+        endDate = addWeeks(startDate, 26 - 1);
+      } else if (dailyTimeRange === '12M') {
+        startDate = subMonths(startDate, Math.abs(dailyDateOffset) * 12);
+        endDate = addMonths(startDate, 12 - 1);
+      }
+    }
+
+    const data = await getDailyHabitCompletionSummary(session, daysToFetch);
+    setDailyChartData(data.map(d => ({ date: d.completion_date, value: d.completion_percentage })));
+    const avg = data.length > 0 ? data.reduce((sum, d) => sum + d.completion_percentage, 0) / data.length : 0;
+    setDailyAvgPercentage(Math.round(avg));
+  }, [session, dailyTimeRange, dailyDateOffset]);
+
+  const fetchWeeklyChartData = useCallback(async () => {
+    if (!session) return;
+
+    let weeksToFetch = 16; // Default for 16W
+    let startDate = startOfWeek(new Date(), { weekStartsOn: 1 });
+    let endDate = endOfWeek(new Date(), { weekStartsOn: 1 });
+
+    if (weeklyTimeRange === '5W') {
+      weeksToFetch = 5;
+    } else if (weeklyTimeRange === '16W') {
+      weeksToFetch = 16;
+    } else if (weeklyTimeRange === '26W') {
+      weeksToFetch = 26;
+    } else if (weeklyTimeRange === '12M') { // Approx 52 weeks
+      weeksToFetch = 52;
+    }
+
+    // Adjust date range based on offset
+    if (weeklyDateOffset !== 0) {
+      if (weeklyTimeRange === '5W') {
+        startDate = subWeeks(startDate, weeksToFetch * weeklyDateOffset);
+        endDate = addWeeks(startDate, weeksToFetch - 1);
+      } else if (weeklyTimeRange === '16W') {
+        startDate = subWeeks(startDate, weeksToFetch * weeklyDateOffset);
+        endDate = addWeeks(startDate, weeksToFetch - 1);
+      } else if (weeklyTimeRange === '26W') {
+        startDate = subWeeks(startDate, weeksToFetch * weeklyDateOffset);
+        endDate = addWeeks(startDate, weeksToFetch - 1);
+      } else if (weeklyTimeRange === '12M') {
+        startDate = subMonths(startDate, Math.abs(weeklyDateOffset) * 12);
+        endDate = addMonths(startDate, 12 - 1);
+      }
+    }
+
+    const data = await getWeeklyHabitCompletionSummary(session, weeksToFetch);
+    setWeeklyChartData(data.map(d => ({ date: d.week_start_date, value: d.completion_percentage })));
+    const avg = data.length > 0 ? data.reduce((sum, d) => sum + d.completion_percentage, 0) / data.length : 0;
+    setWeeklyAvgPercentage(Math.round(avg));
+  }, [session, weeklyTimeRange, weeklyDateOffset]);
+
+
   useEffect(() => {
     if (!sessionLoading) {
       fetchHabitsAndHistory();
+      fetchDailyChartData();
+      fetchWeeklyChartData();
     }
-  }, [fetchHabitsAndHistory, sessionLoading]);
+  }, [fetchHabitsAndHistory, fetchDailyChartData, fetchWeeklyChartData, sessionLoading]);
 
-  const tabs = [
-    { id: 'habits' as const, label: 'Habits', icon: Calendar },
-    { id: 'statistics' as const, label: 'Statistics', icon: BarChart3 },
-    { id: 'archived' as const, label: 'Archived', icon: Archive }
+  const dailyTimeRangeOptions = [
+    { label: '7D', value: '7D' },
+    { label: '31D', value: '31D' },
+    { label: '26W', value: '26W' }, // Approx 6 months
+    { label: '12M', value: '12M' }, // Approx 1 year
   ];
+
+  const weeklyTimeRangeOptions = [
+    { label: '5W', value: '5W' },
+    { label: '16W', value: '16W' },
+    { label: '26W', value: '26W' },
+    { label: '12M', value: '12M' },
+  ];
+
+  const getDailyDateRangeLabel = () => {
+    if (dailyChartData.length === 0) return '';
+    const firstDate = new Date(dailyChartData[0].date);
+    const lastDate = new Date(dailyChartData[dailyChartData.length - 1].date);
+    return `${format(firstDate, 'MMM d, yyyy')} - ${format(lastDate, 'MMM d, yyyy')}`;
+  };
+
+  const getWeeklyDateRangeLabel = () => {
+    if (weeklyChartData.length === 0) return '';
+    const firstDate = new Date(weeklyChartData[0].date);
+    const lastDate = new Date(weeklyChartData[weeklyChartData.length - 1].date);
+    return `${format(firstDate, 'MMM d, yyyy')} - ${format(lastDate, 'MMM d, yyyy')}`;
+  };
 
   if (isLoading || sessionLoading) {
     return (
@@ -105,47 +249,35 @@ const History: React.FC = () => {
       {/* Statistics Tab Content */}
       {activeTab === 'statistics' && (
         <div className="w-full max-w-md space-y-6">
-          <div className="bg-card border border-border rounded-xl shadow-lg p-6">
-            <h2 className="text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
-              <TrendingUp className="h-5 w-5" />
-              Habit Statistics Overview
-            </h2>
-            
-            <div className="grid grid-cols-2 gap-4 mb-6">
-              <div className="bg-secondary rounded-lg p-4 text-center">
-                <div className="text-2xl font-bold text-primary">{habitsHistory.length}</div>
-                <div className="text-sm text-muted-foreground">Active Habits</div>
-              </div>
-              <div className="bg-secondary rounded-lg p-4 text-center">
-                <div className="text-2xl font-bold text-primary">
-                  {habitsHistory.reduce((total, { completionDates }) => total + completionDates.length, 0)}
-                </div>
-                <div className="text-sm text-muted-foreground">Total Completions</div>
-              </div>
-            </div>
+          <OverallStatsCards
+            totalCompletions={totalCompletions}
+            longestStreakEver={longestStreakEver}
+            currentLongestStreak={currentLongestStreak}
+          />
 
-            <div className="space-y-3">
-              <h3 className="text-lg font-medium text-foreground flex items-center gap-2">
-                <Target className="h-4 w-4" />
-                Completion Rates
-              </h3>
-              {habitsHistory.map(({ habit, completionDates }) => (
-                <div key={habit.id} className="flex items-center justify-between">
-                  <span className="text-sm text-foreground">{habit.name}</span>
-                  <span className="text-sm font-medium text-primary">
-                    {completionDates.length} completions
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
+          <HabitCompletionChart
+            title="Daily goals"
+            data={dailyChartData}
+            averagePercentage={dailyAvgPercentage}
+            timeRangeOptions={dailyTimeRangeOptions}
+            selectedTimeRange={dailyTimeRange}
+            onTimeRangeChange={setDailyTimeRange}
+            onNavigateDates={(direction) => setDailyDateOffset(prev => direction === 'prev' ? prev + 1 : Math.max(0, prev - 1))}
+            dateRangeLabel={getDailyDateRangeLabel()}
+            chartType="daily"
+          />
 
-          <div className="bg-card border border-border rounded-xl shadow-lg p-6">
-            <h3 className="text-lg font-medium text-foreground mb-4">Weekly Progress</h3>
-            <div className="text-muted-foreground text-sm">
-              Detailed weekly progress charts and analytics will be available here soon.
-            </div>
-          </div>
+          <HabitCompletionChart
+            title="Weekly goals"
+            data={weeklyChartData}
+            averagePercentage={weeklyAvgPercentage}
+            timeRangeOptions={weeklyTimeRangeOptions}
+            selectedTimeRange={weeklyTimeRange}
+            onTimeRangeChange={setWeeklyTimeRange}
+            onNavigateDates={(direction) => setWeeklyDateOffset(prev => direction === 'prev' ? prev + 1 : Math.max(0, prev - 1))}
+            dateRangeLabel={getWeeklyDateRangeLabel()}
+            chartType="weekly"
+          />
         </div>
       )}
 

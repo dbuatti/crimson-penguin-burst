@@ -27,3 +27,12 @@ export interface HabitFormData {
   goalValue: number;
   reminders: string[];
 }
+
+export interface HabitLog {
+  id: string;
+  habit_id: string;
+  log_date: string; // 'yyyy-MM-dd'
+  is_completed: boolean;
+  value_recorded: number;
+  created_at: string;
+}
