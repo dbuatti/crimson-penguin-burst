@@ -1,5 +1,5 @@
 import React from 'react'; // Required for JSX in toast options
-import { Check, X, Download, Upload } from 'lucide-react'; // Added Download, Upload
+import { Check, X, Download, Upload } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Session } from '@supabase/supabase-js';
 import { showError, showSuccess } from '@/utils/toast'; // Import from project's utility
@@ -226,5 +226,108 @@ export const saveLocalHabits = (habits: Habit[]): void => {
     localStorage.setItem(HABITS_STORAGE_KEY, JSON.stringify(habits));
   } catch (error) {
     console.error("Failed to save habits to local storage:", error);
+  }
+};
+
+export const exportHabits = async (session: Session | null) => {
+  const userId = getUserId(session);
+  if (!userId) {
+    showError('You must be logged in to export habits.', { icon: <X className="h-4 w-4" /> });
+    return;
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('habits')
+      .select('*')
+      .eq('user_id', userId);
+
+    if (error) {
+      console.error("Error fetching habits for export:", error);
+      showError('Failed to export habits.', { icon: <X className="h-4 w-4" /> });
+      return;
+    }
+
+    const habitsToExport = (data || []).map(mapSupabaseHabitToAppHabit);
+    const jsonString = JSON.stringify(habitsToExport, null, 2);
+    const blob = new Blob([jsonString], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `habitkit_habits_${format(new Date(), 'yyyy-MM-dd')}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showSuccess('Habits exported successfully!', { icon: <Check className="h-4 w-4" /> });
+  } catch (error) {
+    console.error("Error during habit export:", error);
+    showError('Failed to export habits.', { icon: <X className="h-4 w-4" /> });
+  }
+};
+
+export const importHabits = async (file: File, session: Session | null) => {
+  const userId = getUserId(session);
+  if (!userId) {
+    showError('You must be logged in to import habits.', { icon: <X className="h-4 w-4" /> });
+    return;
+  }
+
+  try {
+    const fileContent = await file.text();
+    const importedHabits: Habit[] = JSON.parse(fileContent);
+
+    if (!Array.isArray(importedHabits)) {
+      throw new Error("Invalid file format: Expected an array of habits.");
+    }
+
+    let successCount = 0;
+    let failCount = 0;
+
+    for (const habit of importedHabits) {
+      // Ensure imported habits are associated with the current user
+      const habitToInsert = {
+        ...habit,
+        user_id: userId,
+        id: undefined, // Let Supabase generate a new ID
+        created_at: undefined, // Let Supabase set creation timestamp
+        updated_at: undefined, // Let Supabase set update timestamp
+      };
+
+      const { error } = await supabase
+        .from('habits')
+        .insert({
+          user_id: habitToInsert.user_id,
+          name: habitToInsert.name,
+          description: habitToInsert.description,
+          icon: habitToInsert.icon,
+          color: habitToInsert.color,
+          goal_type: habitToInsert.goalType,
+          goal_value: habitToInsert.goalValue,
+          reminders: habitToInsert.reminders,
+          completion_dates: habitToInsert.completionDates,
+          archived: habitToInsert.archived,
+        });
+
+      if (error) {
+        console.error(`Failed to import habit "${habit.name}":`, error);
+        failCount++;
+      } else {
+        successCount++;
+      }
+    }
+
+    if (successCount > 0) {
+      showSuccess(`Successfully imported ${successCount} habit(s)!`, { icon: <Check className="h-4 w-4" /> });
+    }
+    if (failCount > 0) {
+      showError(`Failed to import ${failCount} habit(s). Check console for details.`, { icon: <X className="h-4 w-4" /> });
+    }
+    if (successCount === 0 && failCount === 0) {
+      showError('No habits found in the imported file.', { icon: <X className="h-4 w-4" /> });
+    }
+  } catch (error: any) {
+    console.error("Error during habit import:", error);
+    showError(`Failed to import habits: ${error.message || 'Invalid file format.'}`, { icon: <X className="h-4 w-4" /> });
   }
 };
