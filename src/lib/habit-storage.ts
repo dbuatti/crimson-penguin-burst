@@ -88,6 +88,32 @@ export const getHabits = async (session: Session | null): Promise<Habit[]> => {
   }
 };
 
+export const getHabitCompletionLogs = async (habitId: HabitId, session: Session | null): Promise<string[]> => {
+  const userId = getUserId(session);
+  if (!userId) return [];
+
+  try {
+    const { data, error } = await supabase
+      .from('habit_logs')
+      .select('log_date')
+      .eq('habit_id', habitId)
+      .eq('user_id', userId)
+      .eq('is_completed', true);
+
+    if (error) {
+      console.error(`Failed to fetch completion logs for habit ${habitId}:`, error);
+      return [];
+    }
+
+    // Return unique formatted dates
+    return Array.from(new Set((data || []).map(log => log.log_date)));
+  } catch (error) {
+    console.error(`Failed to fetch completion logs for habit ${habitId}:`, error);
+    return [];
+  }
+};
+
+
 export const addHabit = async (newHabitData: HabitFormData, session: Session | null): Promise<Habit | null> => {
   const userId = getUserId(session);
   if (!userId) return null;

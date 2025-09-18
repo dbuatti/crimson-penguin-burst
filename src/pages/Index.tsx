@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { getHabits, updateHabit, deleteHabit, toggleHabitCompletion } from '@/lib/habit-storage';
 import { Habit } from '@/types/habit';
 import { MadeWithDyad } from "@/components/made-with-dyad";
-import { Plus, Settings, Archive, Upload, Download, LogOut, Sparkles } from 'lucide-react';
+import { Plus, Settings, Archive, Upload, Download, LogOut, Sparkles, History as HistoryIcon } from 'lucide-react'; // Import HistoryIcon
 import { Button } from '@/components/ui/button';
 import { showSuccess, showError } from '@/utils/toast';
 import {
@@ -182,6 +182,11 @@ const Index = () => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="bg-popover border-border text-foreground shadow-lg rounded-lg p-1">
+                <DropdownMenuItem asChild className="hover:bg-accent hover:text-accent-foreground transition-colors duration-150 cursor-pointer rounded-md px-2 py-1.5">
+                  <Link to="/history" className="flex items-center"> {/* Link to History page */}
+                    <HistoryIcon className="mr-2 h-4 w-4" /> View History
+                  </Link>
+                </DropdownMenuItem>
                 <DropdownMenuItem asChild className="hover:bg-accent hover:text-accent-foreground transition-colors duration-150 cursor-pointer rounded-md px-2 py-1.5">
                   <Link to="/archived-habits" className="flex items-center">
                     <Archive className="mr-2 h-4 w-4" /> View Archived Habits
