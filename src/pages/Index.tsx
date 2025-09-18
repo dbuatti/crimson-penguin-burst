@@ -102,10 +102,10 @@ const Index = () => {
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) {
+      console.error('Logout error details:', error); // Added detailed error logging
       toast.error('Failed to log out.', {
         icon: <X className="h-4 w-4" />,
       });
-      console.error('Logout error:', error);
     } else {
       toast.success('Logged out successfully!', {
         icon: <Check className="h-4 w-4" />,
