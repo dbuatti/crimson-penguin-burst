@@ -4,7 +4,7 @@ import { getHabits, updateHabit, deleteHabit } from '@/lib/habit-storage';
 import { Habit } from '@/types/habit';
 import HabitCard from '@/components/HabitCard';
 import { MadeWithDyad } from "@/components/made-with-dyad";
-import { Plus, Settings, Archive, Check, Upload, Download, X, LogOut } from 'lucide-react'; // Import LogOut icon
+import { Plus, Settings, Archive, Check, Upload, Download, X, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import {
@@ -14,15 +14,16 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { exportHabits, importHabits } from '@/lib/data-management';
-import { useSession } from '@/components/SessionContextProvider'; // Import useSession
+import { useSession } from '@/components/SessionContextProvider';
+import { ThemeToggle } from '@/components/ThemeToggle'; // Import ThemeToggle
 
 const Index = () => {
   const [habits, setHabits] = useState<Habit[]>([]);
-  const { supabase, session } = useSession(); // Use the session context
+  const { supabase, session } = useSession();
 
   const fetchHabits = useCallback(() => {
     const allHabits = getHabits();
-    setHabits(allHabits.filter(h => !h.archived)); // Only show non-archived habits on dashboard
+    setHabits(allHabits.filter(h => !h.archived));
   }, []);
 
   useEffect(() => {
@@ -30,7 +31,7 @@ const Index = () => {
   }, [fetchHabits]);
 
   const handleHabitUpdate = () => {
-    fetchHabits(); // Re-fetch habits after any update (e.g., completion toggle)
+    fetchHabits();
   };
 
   const handleArchiveHabit = (id: string) => {
@@ -70,7 +71,7 @@ const Index = () => {
         toast.success('Habits imported successfully! Refreshing...', {
           icon: <Upload className="h-4 w-4" />,
         });
-        fetchHabits(); // Re-fetch to show imported habits
+        fetchHabits();
       } catch (error) {
         console.error('Failed to import habits:', error);
         toast.error('Failed to import habits. Please check the file format.', {
@@ -98,37 +99,40 @@ const Index = () => {
     <div className="min-h-screen bg-background text-foreground p-4 flex flex-col items-center">
       <div className="w-full max-w-md">
         <header className="flex justify-between items-center mb-6">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground transition-colors duration-200">
-                <Settings className="h-6 w-6" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="bg-popover border-border text-foreground shadow-lg">
-              <DropdownMenuItem asChild className="hover:bg-accent hover:text-accent-foreground transition-colors duration-150">
-                <Link to="/archived-habits" className="flex items-center">
-                  <Archive className="mr-2 h-4 w-4" /> View Archived Habits
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleExport} className="flex items-center hover:bg-accent hover:text-accent-foreground transition-colors duration-150">
-                <Download className="mr-2 h-4 w-4" /> Export Data
-              </DropdownMenuItem>
-              <DropdownMenuItem className="flex items-center relative hover:bg-accent hover:text-accent-foreground transition-colors duration-150">
-                <Upload className="mr-2 h-4 w-4" /> Import Data
-                <input
-                  type="file"
-                  accept=".json"
-                  onChange={handleImport}
-                  className="absolute inset-0 opacity-0 cursor-pointer"
-                />
-              </DropdownMenuItem>
-              {session && (
-                <DropdownMenuItem onClick={handleLogout} className="flex items-center text-destructive hover:bg-destructive/10 hover:text-destructive transition-colors duration-150">
-                  <LogOut className="mr-2 h-4 w-4" /> Logout
+          <div className="flex items-center space-x-2"> {/* Group settings and theme toggle */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground transition-colors duration-200">
+                  <Settings className="h-6 w-6" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="bg-popover border-border text-foreground shadow-lg">
+                <DropdownMenuItem asChild className="hover:bg-accent hover:text-accent-foreground transition-colors duration-150">
+                  <Link to="/archived-habits" className="flex items-center">
+                    <Archive className="mr-2 h-4 w-4" /> View Archived Habits
+                  </Link>
                 </DropdownMenuItem>
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
+                <DropdownMenuItem onClick={handleExport} className="flex items-center hover:bg-accent hover:text-accent-foreground transition-colors duration-150">
+                  <Download className="mr-2 h-4 w-4" /> Export Data
+                </DropdownMenuItem>
+                <DropdownMenuItem className="flex items-center relative hover:bg-accent hover:text-accent-foreground transition-colors duration-150">
+                  <Upload className="mr-2 h-4 w-4" /> Import Data
+                  <input
+                    type="file"
+                    accept=".json"
+                    onChange={handleImport}
+                    className="absolute inset-0 opacity-0 cursor-pointer"
+                  />
+                </DropdownMenuItem>
+                {session && (
+                  <DropdownMenuItem onClick={handleLogout} className="flex items-center text-destructive hover:bg-destructive/10 hover:text-destructive transition-colors duration-150">
+                    <LogOut className="mr-2 h-4 w-4" /> Logout
+                  </DropdownMenuItem>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <ThemeToggle /> {/* Add ThemeToggle here */}
+          </div>
 
           <h1 className="text-3xl font-bold text-foreground">HabitKit</h1>
           <Link to="/create-habit">
