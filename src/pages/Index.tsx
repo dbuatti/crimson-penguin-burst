@@ -8,7 +8,8 @@ import { showSuccess, showError } from '@/utils/toast';
 import { useSession } from '@/components/SessionContextProvider';
 import HabitListItem from '@/components/HabitListItem';
 import CircularProgress from '@/components/CircularProgress';
-import HabitListItemSkeleton from '@/components/HabitListItemSkeleton'; // Import the new skeleton component
+import HabitListItemSkeleton from '@/components/HabitListItemSkeleton';
+import { Skeleton } from '@/components/ui/skeleton'; // Import Skeleton component
 
 const Index = () => {
   const [habits, setHabits] = useState<Habit[]>([]);
@@ -114,7 +115,7 @@ const Index = () => {
           <Skeleton className="h-32 w-32 rounded-full" />
         </div>
         <div className="space-y-3 mb-4 w-full max-w-4xl">
-          {Array.from({ length: 3 }).map((_, i) => ( // Render 3 skeleton items
+          {Array.from({ length: 3 }).map((_, i) => (
             <HabitListItemSkeleton key={i} />
           ))}
         </div>
