@@ -8,10 +8,11 @@ import EditHabit from "./pages/EditHabit";
 import HabitCalendar from "./pages/HabitCalendar";
 import ArchivedHabits from "./pages/ArchivedHabits";
 import History from "./pages/History";
-import Settings from "./pages/Settings"; // Import the new Settings page
+import Settings from "./pages/Settings";
 import Login from "./pages/Login";
 import { SessionContextProvider } from "./components/SessionContextProvider";
 import { ThemeProvider } from "./components/ThemeProvider";
+import Layout from "./components/Layout"; // Import the new Layout component
 
 const queryClient = new QueryClient();
 
@@ -22,14 +23,16 @@ const App = () => (
       <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <SessionContextProvider>
           <Routes>
-            <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/create-habit" element={<CreateHabit />} />
-            <Route path="/edit-habit/:id" element={<EditHabit />} />
-            <Route path="/habit-calendar/:id" element={<HabitCalendar />} />
-            <Route path="/archived-habits" element={<ArchivedHabits />} />
-            <Route path="/history" element={<History />} />
-            <Route path="/settings" element={<Settings />} /> {/* Add the new Settings route */}
+            <Route element={<Layout />}> {/* Wrap main routes with Layout */}
+              <Route path="/" element={<Index />} />
+              <Route path="/create-habit" element={<CreateHabit />} />
+              <Route path="/edit-habit/:id" element={<EditHabit />} />
+              <Route path="/habit-calendar/:id" element={<HabitCalendar />} />
+              <Route path="/archived-habits" element={<ArchivedHabits />} />
+              <Route path="/history" element={<History />} />
+              <Route path="/settings" element={<Settings />} />
+            </Route>
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

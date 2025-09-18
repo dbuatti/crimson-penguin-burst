@@ -2,14 +2,13 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { getHabits, updateHabit, deleteHabit, toggleHabitCompletion } from '@/lib/habit-storage';
 import { Habit } from '@/types/habit';
-import { MadeWithDyad } from "@/components/made-with-dyad";
 import { Plus, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { showSuccess, showError } from '@/utils/toast';
 import { useSession } from '@/components/SessionContextProvider';
 import HabitListItem from '@/components/HabitListItem';
 import { cn } from '@/lib/utils';
-import TopNavigation from '@/components/TopNavigation'; // Import the new TopNavigation
+
 
 // Custom Circular Progress component
 interface CircularProgressProps {
@@ -133,77 +132,71 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground p-6 flex flex-col items-center">
-      <div className="w-full max-w-md">
-        <TopNavigation /> {/* Use the new TopNavigation component */}
-
-        {habits.length === 0 ? (
-          <div className="text-center text-muted-foreground mt-12 p-8 bg-card border border-border rounded-xl shadow-lg flex flex-col items-center justify-center">
-            <Sparkles className="h-12 w-12 text-primary mb-4" />
-            <p className="text-xl font-semibold mb-4">No habits yet. Let's build some good routines!</p>
-            <Link to="/create-habit">
-              <Button className="bg-primary hover:bg-primary/90 text-primary-foreground transition-colors duration-200 rounded-lg px-6 py-3 text-base">
-                <Plus className="mr-2 h-4 w-4" /> Create Your First Habit
-              </Button>
-            </Link>
+    <>
+      {habits.length === 0 ? (
+        <div className="text-center text-muted-foreground mt-12 p-8 bg-card border border-border rounded-xl shadow-lg flex flex-col items-center justify-center">
+          <Sparkles className="h-12 w-12 text-primary mb-4" />
+          <p className="text-xl font-semibold mb-4">No habits yet. Let's build some good routines!</p>
+          <Link to="/create-habit">
+            <Button className="bg-primary hover:bg-primary/90 text-primary-foreground transition-colors duration-200 rounded-lg px-6 py-3 text-base">
+              <Plus className="mr-2 h-4 w-4" /> Create Your First Habit
+            </Button>
+          </Link>
+        </div>
+      ) : (
+        <>
+          {/* Overall Daily Progress Circle */}
+          <div className="flex justify-center mb-8">
+            <div className="relative flex items-center justify-center">
+              <CircularProgress
+                percentage={overallDailyProgress}
+                size={128}
+                strokeWidth={12}
+                gradientId="dailyProgressGradient"
+                startColor="#8338EC" // Purple
+                endColor="#3A86FF"   // Blue
+              />
+              <span className="absolute text-3xl font-bold text-foreground">
+                {overallDailyProgress}%
+              </span>
+            </div>
           </div>
-        ) : (
-          <>
-            {/* Overall Daily Progress Circle */}
-            <div className="flex justify-center mb-8">
-              <div className="relative flex items-center justify-center">
-                <CircularProgress
-                  percentage={overallDailyProgress}
-                  size={128}
-                  strokeWidth={12}
-                  gradientId="dailyProgressGradient"
-                  startColor="#8338EC" // Purple
-                  endColor="#3A86FF"   // Blue
-                />
-                <span className="absolute text-3xl font-bold text-foreground">
-                  {overallDailyProgress}%
-                </span>
+
+          {/* Today's Habits */}
+          <div className="space-y-3 mb-8 w-full">
+            {todayHabits.map((habit) => (
+              <HabitListItem
+                key={habit.id}
+                habit={habit}
+                onHabitUpdate={handleHabitUpdate}
+                onArchiveHabit={handleArchiveHabit}
+                onDeleteHabit={handleDeleteHabit}
+                onToggleCompletion={(habitId, dateString) => toggleHabitCompletion(habitId, dateString, session)}
+              />
+            ))}
+          </div>
+
+          {/* Weekly/Monthly Goals */}
+          {weeklyMonthlyHabits.length > 0 && (
+            <>
+              <h2 className="text-2xl font-extrabold text-foreground tracking-tight mb-6 mt-10">Weekly goals</h2>
+              <div className="space-y-3 mb-8 w-full">
+                {weeklyMonthlyHabits.map((habit) => (
+                  <HabitListItem
+                    key={habit.id}
+                    habit={habit}
+                    onHabitUpdate={handleHabitUpdate}
+                    onArchiveHabit={handleArchiveHabit}
+                    onDeleteHabit={handleDeleteHabit}
+                    onToggleCompletion={(habitId, dateString) => toggleHabitCompletion(habitId, dateString, session)}
+                  />
+                ))}
               </div>
-            </div>
-
-            {/* Today's Habits */}
-            <div className="space-y-3 mb-8">
-              {todayHabits.map((habit) => (
-                <HabitListItem
-                  key={habit.id}
-                  habit={habit}
-                  onHabitUpdate={handleHabitUpdate}
-                  onArchiveHabit={handleArchiveHabit}
-                  onDeleteHabit={handleDeleteHabit}
-                  onToggleCompletion={(habitId, dateString) => toggleHabitCompletion(habitId, dateString, session)}
-                />
-              ))}
-            </div>
-
-            {/* Weekly/Monthly Goals */}
-            {weeklyMonthlyHabits.length > 0 && (
-              <>
-                <h2 className="text-2xl font-extrabold text-foreground tracking-tight mb-6 mt-10">Weekly goals</h2>
-                <div className="space-y-3 mb-8">
-                  {weeklyMonthlyHabits.map((habit) => (
-                    <HabitListItem
-                      key={habit.id}
-                      habit={habit}
-                      onHabitUpdate={handleHabitUpdate}
-                      onArchiveHabit={handleArchiveHabit}
-                      onDeleteHabit={handleDeleteHabit}
-                      onToggleCompletion={(habitId, dateString) => toggleHabitCompletion(habitId, dateString, session)}
-                    />
-                  ))}
-                </div>
-              </>
-            )}
-          </>
-        )}
-
-        <MadeWithDyad />
-      </div>
-    </div>
+            </>
+          )}
+        </>
+      )}
+    </>
   );
 };
 
