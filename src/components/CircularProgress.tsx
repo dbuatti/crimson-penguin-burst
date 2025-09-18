@@ -26,7 +26,7 @@ const CircularProgress: React.FC<CircularProgressProps> = ({
   const offset = circumference - (percentage / 100) * circumference;
 
   return (
-    <svg width={size} height={size} className="-rotate-90">
+    <svg width={size} height={size}> {/* Removed -rotate-90 from SVG */}
       <defs>
         <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor={startColor} />
@@ -40,6 +40,7 @@ const CircularProgress: React.FC<CircularProgressProps> = ({
         r={radius}
         cx={size / 2}
         cy={size / 2}
+        transform={`rotate(-90 ${size / 2} ${size / 2})`} {/* Apply rotation to circle */}
       />
       <circle
         stroke={`url(#${gradientId})`}
@@ -51,11 +52,12 @@ const CircularProgress: React.FC<CircularProgressProps> = ({
         r={radius}
         cx={size / 2}
         cy={size / 2}
+        transform={`rotate(-90 ${size / 2} ${size / 2})`} {/* Apply rotation to circle */}
         style={{ transition: 'stroke-dashoffset 0.35s' }}
       />
       {children && (
-        <foreignObject x="0" y="0" width={size} height={size} className="rotate-90">
-          <div className="flex items-center justify-center w-full h-full" style={{ transform: 'rotate(90deg)' }}>
+        <foreignObject x="0" y="0" width={size} height={size}> {/* Removed rotation from foreignObject */}
+          <div className="flex items-center justify-center w-full h-full"> {/* Removed rotation from inner div */}
             {children}
           </div>
         </foreignObject>
