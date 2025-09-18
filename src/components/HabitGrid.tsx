@@ -28,14 +28,14 @@ const HabitGrid: React.FC<HabitGridProps> = ({
 
   return (
     <div className="p-3 rounded-md bg-secondary border border-border overflow-hidden">
-      {/* Day labels - Removed */}
-      {/* <div className="grid grid-cols-7 gap-1 mb-2">
+      {/* Day labels */}
+      <div className="grid grid-cols-7 gap-1 mb-2">
         {WEEK_DAYS.map((day) => (
           <div key={day} className="text-center text-xs font-medium text-muted-foreground">
             {day}
           </div>
         ))}
-      </div> */}
+      </div>
 
       {/* Habit completion grid */}
       <div className="grid grid-cols-7 gap-1">
@@ -45,21 +45,29 @@ const HabitGrid: React.FC<HabitGridProps> = ({
           const isPast = date < today;
           const isFuture = date > today;
           const isCurrentDay = isSameDay(date, today);
+          const dayOfMonth = format(date, 'd');
 
           return (
             <div
               key={index}
-              className={cn(
-                "w-5 h-5 rounded-sm transition-all duration-200",
-                {
-                  "bg-accent": !isCompleted && !isPast, // Default for incomplete future/current days
-                  "bg-muted": isPast && !isCompleted, // Distinct background for past incomplete days
-                  "border border-primary/50": isCurrentDay && !isCompleted, // Highlight today with a subtle border if incomplete
-                  "opacity-50": isFuture, // Dim future dates
-                }
-              )}
-              style={{ backgroundColor: isCompleted ? habitColor : undefined }}
-            />
+              className="relative w-5 h-5 flex items-center justify-center" // Added relative positioning
+            >
+              <div
+                className={cn(
+                  "absolute inset-0 rounded-sm transition-all duration-200 z-10", // Square on top
+                  {
+                    "bg-accent": !isCompleted && !isPast,
+                    "bg-muted": isPast && !isCompleted,
+                    "border border-primary/50": isCurrentDay && !isCompleted,
+                    "opacity-50": isFuture,
+                  }
+                )}
+                style={{ backgroundColor: isCompleted ? habitColor : undefined }}
+              />
+              <span className="absolute text-[8px] font-bold text-foreground opacity-20 z-0"> {/* Number behind */}
+                {dayOfMonth}
+              </span>
+            </div>
           );
         })}
       </div>
