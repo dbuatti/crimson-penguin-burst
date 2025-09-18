@@ -6,14 +6,14 @@ import HabitCard from '@/components/HabitCard';
 import { MadeWithDyad } from "@/components/made-with-dyad";
 import { Plus, Settings, Archive, Check, Upload, Download, X, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { showError, showSuccess } from '@/utils/toast'; // Changed import
+import { showError, showSuccess } from '@/utils/toast';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { exportHabits, importHabits } from '@/lib/data-management';
+import { exportHabits, importHabits } from '@/lib/data-management.tsx';
 import { useSession } from '@/components/SessionContextProvider';
 import { ThemeToggle } from '@/components/ThemeToggle';
 
