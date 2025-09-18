@@ -1,71 +1,13 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { getHabits, updateHabit, deleteHabit, toggleHabitCompletion } from '@/lib/habit-storage';
+import { getHabits, updateHabit, deleteHabit, toggleHabitCompletion, incrementHabitCompletion, decrementHabitCompletion } from '@/lib/habit-storage';
 import { Habit } from '@/types/habit';
-import { Plus, Sparkles } from 'lucide-react';
+import { Plus, Sparkles, Edit } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { showSuccess, showError } from '@/utils/toast';
 import { useSession } from '@/components/SessionContextProvider';
 import HabitListItem from '@/components/HabitListItem';
-import { cn } from '@/lib/utils';
-
-
-// Custom Circular Progress component
-interface CircularProgressProps {
-  percentage: number;
-  size?: number;
-  strokeWidth?: number;
-  gradientId: string;
-  startColor: string;
-  endColor: string;
-  backgroundColor?: string;
-}
-
-const CircularProgress: React.FC<CircularProgressProps> = ({
-  percentage,
-  size = 128,
-  strokeWidth = 12,
-  gradientId,
-  startColor,
-  endColor,
-  backgroundColor = 'hsl(var(--muted))',
-}) => {
-  const radius = (size - strokeWidth) / 2;
-  const circumference = 2 * Math.PI * radius;
-  const offset = circumference - (percentage / 100) * circumference;
-
-  return (
-    <svg width={size} height={size} className="-rotate-90">
-      <defs>
-        <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor={startColor} />
-          <stop offset="100%" stopColor={endColor} />
-        </linearGradient>
-      </defs>
-      <circle
-        stroke={backgroundColor}
-        fill="transparent"
-        strokeWidth={strokeWidth}
-        r={radius}
-        cx={size / 2}
-        cy={size / 2}
-      />
-      <circle
-        stroke={`url(#${gradientId})`}
-        fill="transparent"
-        strokeWidth={strokeWidth}
-        strokeDasharray={circumference + ' ' + circumference}
-        strokeDashoffset={offset}
-        strokeLinecap="round"
-        r={radius}
-        cx={size / 2}
-        cy={size / 2}
-        style={{ transition: 'stroke-dashoffset 0.35s' }}
-      />
-    </svg>
-  );
-};
-
+import CircularProgress from '@/components/CircularProgress'; // Import the new CircularProgress component
 
 const Index = () => {
   const [habits, setHabits] = useState<Habit[]>([]);
@@ -116,6 +58,39 @@ const Index = () => {
     }
   };
 
+  const handleToggleCompletion = async (habitId: string, dateString: string) => {
+    const success = await toggleHabitCompletion(habitId, dateString, session);
+    if (success) {
+      showSuccess('Habit completion toggled!');
+      fetchHabits();
+    } else {
+      showError('Failed to toggle habit completion.');
+    }
+    return success;
+  };
+
+  const handleIncrementCompletion = async (habitId: string, dateString: string) => {
+    const success = await incrementHabitCompletion(habitId, dateString, session);
+    if (success) {
+      showSuccess('Habit progress incremented!');
+      fetchHabits();
+    } else {
+      showError('Failed to increment habit progress.');
+    }
+    return success;
+  };
+
+  const handleDecrementCompletion = async (habitId: string, dateString: string) => {
+    const success = await decrementHabitCompletion(habitId, dateString, session);
+    if (success) {
+      showSuccess('Habit progress decremented!');
+      fetchHabits();
+    } else {
+      showError('Failed to decrement habit progress.');
+    }
+    return success;
+  };
+
   const todayHabits = habits.filter(h => h.goalType === 'daily');
   const weeklyMonthlyHabits = habits.filter(h => h.goalType === 'weekly' || h.goalType === 'monthly');
 
@@ -145,13 +120,20 @@ const Index = () => {
         </div>
       ) : (
         <>
-          <div className="w-full flex justify-end mb-4">
-            <Link to="/create-habit">
+          <div className="w-full flex items-center justify-between mb-8">
+            <h1 className="text-3xl font-extrabold text-foreground tracking-tight">Today</h1>
+            <div className="flex space-x-2">
               <Button variant="ghost" size="icon" className="text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors duration-200 rounded-lg">
-                <Plus className="h-5 w-5" />
+                <Edit className="h-5 w-5" />
               </Button>
-            </Link>
+              <Link to="/create-habit">
+                <Button variant="ghost" size="icon" className="text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors duration-200 rounded-lg">
+                  <Plus className="h-5 w-5" />
+                </Button>
+              </Link>
+            </div>
           </div>
+
           {/* Overall Daily Progress Circle */}
           <div className="flex justify-center mb-8">
             <div className="relative flex items-center justify-center">
@@ -162,10 +144,11 @@ const Index = () => {
                 gradientId="dailyProgressGradient"
                 startColor="#8338EC" // Purple
                 endColor="#3A86FF"   // Blue
-              />
-              <span className="absolute text-3xl font-bold text-foreground">
-                {overallDailyProgress}%
-              </span>
+              >
+                <span className="text-3xl font-bold text-foreground">
+                  {overallDailyProgress}%
+                </span>
+              </CircularProgress>
             </div>
           </div>
 
@@ -178,7 +161,9 @@ const Index = () => {
                 onHabitUpdate={handleHabitUpdate}
                 onArchiveHabit={handleArchiveHabit}
                 onDeleteHabit={handleDeleteHabit}
-                onToggleCompletion={(habitId, dateString) => toggleHabitCompletion(habitId, dateString, session)}
+                onToggleCompletion={handleToggleCompletion}
+                onIncrementCompletion={handleIncrementCompletion}
+                onDecrementCompletion={handleDecrementCompletion}
               />
             ))}
           </div>
@@ -195,7 +180,9 @@ const Index = () => {
                     onHabitUpdate={handleHabitUpdate}
                     onArchiveHabit={handleArchiveHabit}
                     onDeleteHabit={handleDeleteHabit}
-                    onToggleCompletion={(habitId, dateString) => toggleHabitCompletion(habitId, dateString, session)}
+                    onToggleCompletion={handleToggleCompletion}
+                    onIncrementCompletion={handleIncrementCompletion}
+                    onDecrementCompletion={handleDecrementCompletion}
                   />
                 ))}
               </div>

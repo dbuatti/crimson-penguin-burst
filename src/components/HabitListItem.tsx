@@ -1,6 +1,6 @@
 import React from 'react';
 import { Habit } from '@/types/habit';
-import { Check, Circle } from 'lucide-react'; // Only Check and Circle are needed for indicators
+import { Check, Circle, Plus, Minus } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { MoreVertical, Edit, CalendarDays, Archive, Share2, Trash2 } from 'lucide-react';
+import CircularProgress from './CircularProgress'; // Import the new CircularProgress component
 
 interface HabitListItemProps {
   habit: Habit;
@@ -19,7 +20,8 @@ interface HabitListItemProps {
   onArchiveHabit: (id: string) => void;
   onDeleteHabit: (id: string) => void;
   onToggleCompletion: (habitId: string, dateString: string) => Promise<boolean>;
-  // Removed onIncrementCompletion and onDecrementCompletion as per design
+  onIncrementCompletion: (habitId: string, dateString: string) => Promise<boolean>;
+  onDecrementCompletion: (habitId: string, dateString: string) => Promise<boolean>;
 }
 
 const HabitListItem: React.FC<HabitListItemProps> = ({
@@ -28,6 +30,8 @@ const HabitListItem: React.FC<HabitListItemProps> = ({
   onArchiveHabit,
   onDeleteHabit,
   onToggleCompletion,
+  onIncrementCompletion,
+  onDecrementCompletion,
 }) => {
   const today = new Date().toISOString().split('T')[0];
 
@@ -40,13 +44,21 @@ const HabitListItem: React.FC<HabitListItemProps> = ({
   }, [habit.icon]);
 
   const handleToggle = async () => {
-    const success = await onToggleCompletion(habit.id, today);
-    if (success) onHabitUpdate();
+    await onToggleCompletion(habit.id, today);
+  };
+
+  const handleIncrement = async () => {
+    await onIncrementCompletion(habit.id, today);
+  };
+
+  const handleDecrement = async () => {
+    await onDecrementCompletion(habit.id, today);
   };
 
   const isSimpleDailyHabit = habit.goalType === 'daily' && habit.goalValue === 1;
   const currentCompletion = habit.currentCompletionCount || 0;
   const goal = habit.goalValue;
+  const progressPercentage = goal > 0 ? Math.min(100, (currentCompletion / goal) * 100) : 0;
 
   const getGoalText = () => {
     if (habit.description) return habit.description;
@@ -86,11 +98,39 @@ const HabitListItem: React.FC<HabitListItemProps> = ({
             {habit.isCompletedToday && <Check className="h-5 w-5" />}
           </Button>
         ) : (
-          <div
-            className="h-9 w-9 rounded-full flex items-center justify-center text-sm font-semibold text-white"
-            style={{ backgroundColor: habit.color }}
-          >
-            {currentCompletion}
+          <div className="flex items-center space-x-1">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleDecrement}
+              disabled={currentCompletion <= 0}
+              className="h-8 w-8 text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors duration-200 rounded-full"
+            >
+              <Minus className="h-4 w-4" />
+            </Button>
+            <div className="relative flex items-center justify-center h-9 w-9">
+              <CircularProgress
+                percentage={progressPercentage}
+                size={36} // Smaller size for individual habit progress
+                strokeWidth={4}
+                gradientId={`habitProgressGradient-${habit.id}`}
+                startColor={habit.color}
+                endColor={habit.color}
+                backgroundColor="hsl(var(--muted))"
+              >
+                <span className="text-xs font-semibold text-foreground">
+                  {currentCompletion}
+                </span>
+              </CircularProgress>
+            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleIncrement}
+              className="h-8 w-8 text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors duration-200 rounded-full"
+            >
+              <Plus className="h-4 w-4" />
+            </Button>
           </div>
         )}
         <DropdownMenu>
