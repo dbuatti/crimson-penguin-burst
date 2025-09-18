@@ -5,7 +5,7 @@ import { Habit } from '@/types/habit';
 import { Calendar } from '@/components/ui/calendar';
 import { Button } from '@/components/ui/button';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react'; // Only X is needed for the button
-import { showSuccess, showError } from '@/utils/toast'; // Updated import
+import { showSuccess, showError } from '@/utils/toast';
 import { format, parseISO } from 'date-fns';
 import { useSession } from '@/components/SessionContextProvider';
 

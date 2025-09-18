@@ -1,6 +1,6 @@
 import { getHabits, addHabit, updateHabit, getHabitById } from './habit-storage'; // Use Supabase functions for data operations
 import { Habit } from '@/types/habit';
-import { showSuccess, showError } from '@/utils/toast'; // Updated import
+import { showSuccess, showError } from '@/utils/toast';
 import { Session } from '@supabase/supabase-js';
 
 export const exportHabits = async (session: Session | null): Promise<void> => {

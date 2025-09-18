@@ -6,7 +6,7 @@ import HabitCard from '@/components/HabitCard';
 import { MadeWithDyad } from "@/components/made-with-dyad";
 import { Plus, Settings, Archive, Upload, Download, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { showSuccess, showError } from '@/utils/toast'; // Updated import
+import { showSuccess, showError } from '@/utils/toast';
 import {
   DropdownMenu,
   DropdownMenuContent,

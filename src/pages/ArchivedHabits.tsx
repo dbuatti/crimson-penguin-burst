@@ -4,7 +4,7 @@ import { getHabits, updateHabit, deleteHabit } from '@/lib/habit-storage';
 import { Habit } from '@/types/habit';
 import HabitCard from '@/components/HabitCard';
 import { Button } from '@/components/ui/button';
-import { showSuccess, showError } from '@/utils/toast'; // Updated import
+import { showSuccess, showError } from '@/utils/toast';
 import { ArrowLeft, Trash2 } from 'lucide-react'; // Only ArrowLeft and Trash2 are needed for buttons
 import { useSession } from '@/components/SessionContextProvider';
 

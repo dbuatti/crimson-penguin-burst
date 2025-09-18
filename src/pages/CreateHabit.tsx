@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { addHabit } from '@/lib/habit-storage';
 import { HabitFormData } from '@/types/habit';
 import HabitForm from '@/components/HabitForm';
-import { showSuccess, showError } from '@/utils/toast'; // Updated import
+import { showSuccess, showError } from '@/utils/toast';
 import { X } from 'lucide-react'; // Only X is needed for the button
 import { Button } from '@/components/ui/button';
 import { useSession } from '@/components/SessionContextProvider';
