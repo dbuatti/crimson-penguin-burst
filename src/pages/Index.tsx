@@ -113,9 +113,9 @@ const Index = () => {
       });
     }
     // Explicitly clear Supabase auth token from local storage
-    // The key format is 'sb-<project-ref>-auth-token'
     localStorage.removeItem('sb-gdmjttmjjhadltaihpgr-auth-token');
     navigate('/login');
+    window.location.reload(); // Force a full page reload
   };
 
   if (sessionLoading) {
