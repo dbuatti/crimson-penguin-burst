@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { addHabit } from '@/lib/habit-storage';
 import { HabitFormData } from '@/types/habit';
 import HabitForm from '@/components/HabitForm';
-import { showError, showSuccess } from '@/utils/toast'; // Changed import
-import { X, Check } from 'lucide-react';
+import { showSuccess, showError } from '@/utils/toast'; // Updated import
+import { X } from 'lucide-react'; // Only X is needed for the button
 import { Button } from '@/components/ui/button';
 import { useSession } from '@/components/SessionContextProvider';
 
@@ -18,20 +18,14 @@ const CreateHabit: React.FC = () => {
     try {
       const result = await addHabit(data, session);
       if (result) {
-        showSuccess('Habit created successfully!', {
-          icon: <Check className="h-4 w-4" />,
-        });
+        showSuccess('Habit created successfully!');
         navigate('/');
       } else {
-        showError('Failed to create habit.', {
-          icon: <X className="h-4 w-4" />,
-        });
+        showError('Failed to create habit.');
       }
     } catch (error) {
       console.error('Failed to create habit:', error);
-      showError('Failed to create habit.', {
-        icon: <X className="h-4 w-4" />,
-      });
+      showError('Failed to create habit.');
     } finally {
       setIsSubmitting(false);
     }

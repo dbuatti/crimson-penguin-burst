@@ -4,9 +4,9 @@ import { getHabitById, toggleHabitCompletion } from '@/lib/habit-storage';
 import { Habit } from '@/types/habit';
 import { Calendar } from '@/components/ui/calendar';
 import { Button } from '@/components/ui/button';
-import { X, Check, ChevronLeft, ChevronRight } from 'lucide-react';
-import { showError, showSuccess } from '@/utils/toast'; // Changed import
-import { format, isSameDay, parseISO } from 'date-fns';
+import { X, ChevronLeft, ChevronRight } from 'lucide-react'; // Only X is needed for the button
+import { showSuccess, showError } from '@/utils/toast'; // Updated import
+import { format, parseISO } from 'date-fns';
 import { useSession } from '@/components/SessionContextProvider';
 
 const HabitCalendar: React.FC = () => {
@@ -23,9 +23,7 @@ const HabitCalendar: React.FC = () => {
       if (fetchedHabit) {
         setHabit(fetchedHabit);
       } else {
-        showError('Habit not found.', {
-          icon: <X className="h-4 w-4" />,
-        });
+        showError('Habit not found.');
         navigate('/');
       }
     }
@@ -45,13 +43,9 @@ const HabitCalendar: React.FC = () => {
     const success = await toggleHabitCompletion(habit.id, dateString, session);
     if (success) {
       fetchHabit(); // Re-fetch habit to update calendar display
-      showSuccess(`Habit completion for ${dateString} toggled!`, {
-        icon: <Check className="h-4 w-4" />,
-      });
+      showSuccess(`Habit completion for ${dateString} toggled!`);
     } else {
-      showError('Failed to toggle habit completion.', {
-        icon: <X className="h-4 w-4" />,
-      });
+      showError('Failed to toggle habit completion.');
     }
   };
 

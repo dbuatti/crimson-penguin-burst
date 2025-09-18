@@ -3,8 +3,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { getHabitById, updateHabit } from '@/lib/habit-storage';
 import { HabitFormData, Habit } from '@/types/habit';
 import HabitForm from '@/components/HabitForm';
-import { showError, showSuccess } from '@/utils/toast'; // Changed import
-import { X, Check } from 'lucide-react';
+import { showSuccess, showError } from '@/utils/toast'; // Updated import
+import { X } from 'lucide-react'; // Only X is needed for the button
 import { Button } from '@/components/ui/button';
 import { useSession } from '@/components/SessionContextProvider';
 
@@ -32,9 +32,7 @@ const EditHabit: React.FC = () => {
           reminders: fetchedHabit.reminders,
         });
       } else {
-        showError('Habit not found.', {
-          icon: <X className="h-4 w-4" />,
-        });
+        showError('Habit not found.');
         navigate('/');
       }
     }
@@ -58,20 +56,14 @@ const EditHabit: React.FC = () => {
       };
       const result = await updateHabit(updatedHabit, session);
       if (result) {
-        showSuccess('Habit updated successfully!', {
-          icon: <Check className="h-4 w-4" />,
-        });
+        showSuccess('Habit updated successfully!');
         navigate('/');
       } else {
-        showError('Failed to update habit.', {
-          icon: <X className="h-4 w-4" />,
-        });
+        showError('Failed to update habit.');
       }
     } catch (error) {
       console.error('Failed to update habit:', error);
-      showError('Failed to update habit.', {
-        icon: <X className="h-4 w-4" />,
-      });
+      showError('Failed to update habit.');
     } finally {
       setIsSubmitting(false);
     }

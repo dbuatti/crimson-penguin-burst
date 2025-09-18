@@ -4,8 +4,8 @@ import { getHabits, updateHabit, deleteHabit } from '@/lib/habit-storage';
 import { Habit } from '@/types/habit';
 import HabitCard from '@/components/HabitCard';
 import { Button } from '@/components/ui/button';
-import { showError, showSuccess } from '@/utils/toast'; // Changed import
-import { ArchiveRestore, ArrowLeft, Check, Trash2, X } from 'lucide-react';
+import { showSuccess, showError } from '@/utils/toast'; // Updated import
+import { ArrowLeft, Trash2 } from 'lucide-react'; // Only ArrowLeft and Trash2 are needed for buttons
 import { useSession } from '@/components/SessionContextProvider';
 
 const ArchivedHabits: React.FC = () => {
@@ -38,14 +38,10 @@ const ArchivedHabits: React.FC = () => {
       const updatedHabit = { ...habitToUnarchive, archived: false };
       const result = await updateHabit(updatedHabit, session);
       if (result) {
-        showSuccess('Habit unarchived successfully!', {
-          icon: <Check className="h-4 w-4" />,
-        });
+        showSuccess('Habit unarchived successfully!');
         fetchArchivedHabits();
       } else {
-        showError('Failed to unarchive habit.', {
-          icon: <X className="h-4 w-4" />,
-        });
+        showError('Failed to unarchive habit.');
       }
     }
   };
@@ -54,14 +50,10 @@ const ArchivedHabits: React.FC = () => {
     if (window.confirm("Are you sure you want to permanently delete this habit? This action cannot be undone.")) {
       const success = await deleteHabit(id, session);
       if (success) {
-        showSuccess('Habit deleted permanently!', {
-          icon: <Trash2 className="h-4 w-4" />,
-        });
+        showSuccess('Habit deleted permanently!');
         fetchArchivedHabits();
       } else {
-        showError('Failed to delete habit.', {
-          icon: <X className="h-4 w-4" />,
-        });
+        showError('Failed to delete habit.');
       }
     }
   };

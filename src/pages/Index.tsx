@@ -4,16 +4,16 @@ import { getHabits, updateHabit, deleteHabit } from '@/lib/habit-storage';
 import { Habit } from '@/types/habit';
 import HabitCard from '@/components/HabitCard';
 import { MadeWithDyad } from "@/components/made-with-dyad";
-import { Plus, Settings, Archive, Check, Upload, Download, X, LogOut } from 'lucide-react';
+import { Plus, Settings, Archive, Upload, Download, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { showError, showSuccess } from '@/utils/toast';
+import { showSuccess, showError } from '@/utils/toast'; // Updated import
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { exportHabits, importHabits } from '@/lib/data-management.tsx';
+import { exportHabits, importHabits } from '@/lib/data-management';
 import { useSession } from '@/components/SessionContextProvider';
 import { ThemeToggle } from '@/components/ThemeToggle';
 
@@ -47,14 +47,10 @@ const Index = () => {
       const updatedHabit = { ...habitToArchive, archived: !habitToArchive.archived };
       const result = await updateHabit(updatedHabit, session);
       if (result) {
-        showSuccess(`Habit ${updatedHabit.archived ? 'archived' : 'unarchived'}!`, {
-          icon: <Check className="h-4 w-4" />,
-        });
+        showSuccess(`Habit ${updatedHabit.archived ? 'archived' : 'unarchived'}!`);
         fetchHabits();
       } else {
-        showError('Failed to archive/unarchive habit.', {
-          icon: <X className="h-4 w-4" />,
-        });
+        showError('Failed to archive/unarchive habit.');
       }
     }
   };
@@ -63,14 +59,10 @@ const Index = () => {
     if (window.confirm("Are you sure you want to delete this habit? This action cannot be undone.")) {
       const success = await deleteHabit(id, session);
       if (success) {
-        showSuccess('Habit deleted successfully!', {
-          icon: <Check className="h-4 w-4" />,
-        });
+        showSuccess('Habit deleted successfully!');
         fetchHabits();
       } else {
-        showError('Failed to delete habit.', {
-          icon: <X className="h-4 w-4" />,
-        });
+        showError('Failed to delete habit.');
       }
     }
   };
@@ -97,13 +89,9 @@ const Index = () => {
     const { error } = await supabase.auth.signOut();
     if (error) {
       console.error('Logout error details:', error);
-      showError('Logout attempted, but an error occurred. Redirecting...', {
-        icon: <X className="h-4 w-4" />,
-      });
+      showError('Logout attempted, but an error occurred. Redirecting...');
     } else {
-      showSuccess('Logged out successfully!', {
-        icon: <Check className="h-4 w-4" />,
-      });
+      showSuccess('Logged out successfully!');
     }
     // Explicitly clear Supabase auth token from local storage
     localStorage.removeItem('sb-gdmjttmjjhadltaihpgr-auth-token');
