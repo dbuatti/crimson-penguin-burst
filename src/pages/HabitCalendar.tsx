@@ -26,19 +26,17 @@ const HabitCalendar: React.FC = () => {
       if (fetchedHabit) {
         setHabit(fetchedHabit);
 
-        // Fetch all completion logs for this habit
         const { data: logsData, error: logsError } = await supabase
           .from('habit_logs')
           .select('log_date')
           .eq('habit_id', fetchedHabit.id)
           .eq('user_id', session.user.id)
-          .eq('is_completed', true); // Only count actual completions
+          .eq('is_completed', true);
 
         if (logsError) {
           console.error("Failed to fetch habit logs for calendar:", logsError);
           setCompletedDates([]);
         } else {
-          // For calendar display, we just need unique dates where it was completed at least once
           const uniqueCompletedDates = Array.from(new Set((logsData || []).map(log => log.log_date)));
           setCompletedDates(uniqueCompletedDates.map(dateString => parseISO(dateString)));
         }
@@ -62,7 +60,7 @@ const HabitCalendar: React.FC = () => {
     const dateString = format(date, 'yyyy-MM-dd');
     const success = await toggleHabitCompletion(habit.id, dateString, session);
     if (success) {
-      fetchHabitAndLogs(); // Re-fetch habit and logs to update calendar display
+      fetchHabitAndLogs();
       showSuccess(`Habit completion for ${dateString} toggled!`);
     } else {
       showError('Failed to toggle habit completion.');
@@ -96,7 +94,7 @@ const HabitCalendar: React.FC = () => {
   return (
     <div className="min-h-screen bg-background text-foreground p-6 flex flex-col items-center">
       <PageHeader title={`Calendar: ${habit.name}`} backLink="/" />
-      <div className="w-full max-w-2xl bg-card border border-border rounded-xl shadow-lg p-4"> {/* Changed max-w-md to max-w-2xl */}
+      <div className="w-full max-w-4xl bg-card border border-border rounded-xl shadow-lg p-4"> {/* Changed max-w-2xl to max-w-4xl */}
         <Calendar
           mode="single"
           month={month}

@@ -41,20 +41,20 @@ const History: React.FC = () => {
   // Daily Chart State
   const [dailyChartData, setDailyChartData] = useState<ChartDataPoint[]>([]);
   const [dailyAvgPercentage, setDailyAvgPercentage] = useState(0);
-  const [dailyTimeRange, setDailyTimeRange] = useState('31D'); // Default to 31 days
-  const [dailyDateOffset, setDailyDateOffset] = useState(0); // Offset in days/weeks/months
+  const [dailyTimeRange, setDailyTimeRange] = useState('31D');
+  const [dailyDateOffset, setDailyDateOffset] = useState(0);
 
   // Weekly Chart State
   const [weeklyChartData, setWeeklyChartData] = useState<ChartDataPoint[]>([]);
   const [weeklyAvgPercentage, setWeeklyAvgPercentage] = useState(0);
-  const [weeklyTimeRange, setWeeklyTimeRange] = useState('16W'); // Default to 16 weeks
-  const [weeklyDateOffset, setWeeklyDateOffset] = useState(0); // Offset in weeks/months
+  const [weeklyTimeRange, setWeeklyTimeRange] = useState('16W');
+  const [weeklyDateOffset, setWeeklyDateOffset] = useState(0);
 
   // Monthly Chart State
   const [monthlyChartData, setMonthlyChartData] = useState<ChartDataPoint[]>([]);
   const [monthlyAvgPercentage, setMonthlyAvgPercentage] = useState(0);
-  const [monthlyTimeRange, setMonthlyTimeRange] = useState('12M'); // Default to 12 months
-  const [monthlyDateOffset, setMonthlyDateOffset] = useState(0); // Offset in months
+  const [monthlyTimeRange, setMonthlyTimeRange] = useState('12M');
+  const [monthlyDateOffset, setMonthlyDateOffset] = useState(0);
 
   const fetchHabitsAndHistory = useCallback(async () => {
     if (session) {
@@ -70,7 +70,6 @@ const History: React.FC = () => {
       const results = await Promise.all(historyPromises);
       setHabitsHistory(results);
 
-      // Calculate overall stats
       const allLogs = await getAllHabitLogs(session);
       const total = allLogs.length;
       setTotalCompletions(total);
@@ -91,18 +90,17 @@ const History: React.FC = () => {
   const fetchDailyChartData = useCallback(async () => {
     if (!session) return;
 
-    let daysToFetch = 30; // Default for 31D
+    let daysToFetch = 30;
     if (dailyTimeRange === '7D') {
       daysToFetch = 7;
     } else if (dailyTimeRange === '31D') {
       daysToFetch = 30;
-    } else if (dailyTimeRange === '26W') { // Approx 6 months
+    } else if (dailyTimeRange === '26W') {
       daysToFetch = 26 * 7;
-    } else if (dailyTimeRange === '12M') { // Approx 1 year
+    } else if (dailyTimeRange === '12M') {
       daysToFetch = 365;
     }
 
-    // Calculate the end date for the current view based on the offset
     const currentViewEndDate = subDays(startOfDay(new Date()), daysToFetch * dailyDateOffset);
 
     const data = await getDailyHabitCompletionSummary(session, daysToFetch, currentViewEndDate);
@@ -114,18 +112,17 @@ const History: React.FC = () => {
   const fetchWeeklyChartData = useCallback(async () => {
     if (!session) return;
 
-    let weeksToFetch = 16; // Default for 16W
+    let weeksToFetch = 16;
     if (weeklyTimeRange === '5W') {
       weeksToFetch = 5;
     } else if (weeklyTimeRange === '16W') {
       weeksToFetch = 16;
     } else if (weeklyTimeRange === '26W') {
       weeksToFetch = 26;
-    } else if (weeklyTimeRange === '12M') { // Approx 52 weeks
+    } else if (weeklyTimeRange === '12M') {
       weeksToFetch = 52;
     }
 
-    // Calculate the end date for the current view based on the offset
     const currentViewEndDate = subWeeks(startOfWeek(new Date(), { weekStartsOn: 1 }), weeksToFetch * weeklyDateOffset);
 
     const data = await getWeeklyHabitCompletionSummary(session, weeksToFetch, currentViewEndDate);
@@ -137,16 +134,15 @@ const History: React.FC = () => {
   const fetchMonthlyChartData = useCallback(async () => {
     if (!session) return;
 
-    let monthsToFetch = 12; // Default for 12M
+    let monthsToFetch = 12;
     if (monthlyTimeRange === '6M') {
       monthsToFetch = 6;
     } else if (monthlyTimeRange === '12M') {
       monthsToFetch = 12;
-    } else if (monthlyTimeRange === '2Y') { // 2 years
+    } else if (monthlyTimeRange === '2Y') {
       monthsToFetch = 24;
     }
 
-    // Calculate the end date for the current view based on the offset
     const currentViewEndDate = subMonths(startOfMonth(new Date()), monthsToFetch * monthlyDateOffset);
 
     const data = await getMonthlyHabitCompletionSummary(session, monthsToFetch, currentViewEndDate);
@@ -161,15 +157,15 @@ const History: React.FC = () => {
       fetchHabitsAndHistory();
       fetchDailyChartData();
       fetchWeeklyChartData();
-      fetchMonthlyChartData(); // Fetch monthly data
+      fetchMonthlyChartData();
     }
   }, [fetchHabitsAndHistory, fetchDailyChartData, fetchWeeklyChartData, fetchMonthlyChartData, sessionLoading]);
 
   const dailyTimeRangeOptions = [
     { label: '7D', value: '7D' },
     { label: '31D', value: '31D' },
-    { label: '26W', value: '26W' }, // Approx 6 months
-    { label: '12M', value: '12M' }, // Approx 1 year
+    { label: '26W', value: '26W' },
+    { label: '12M', value: '12M' },
   ];
 
   const weeklyTimeRangeOptions = [
@@ -216,8 +212,7 @@ const History: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground p-6 flex flex-col items-center">
-      {/* Segmented Navigation */}
-      <div className="flex items-center justify-center p-1 bg-secondary rounded-full shadow-inner border border-border mb-6 max-w-2xl w-full"> {/* Added max-w-2xl and w-full */}
+      <div className="flex items-center justify-center p-1 bg-secondary rounded-full shadow-inner border border-border mb-6 max-w-4xl w-full"> {/* Changed max-w-2xl to max-w-4xl */}
         {tabs.map((tab) => {
           const IconComponent = tab.icon;
           return (
@@ -238,9 +233,8 @@ const History: React.FC = () => {
         })}
       </div>
 
-      {/* Habits Tab Content */}
       {activeTab === 'habits' && (
-        <div className="w-full max-w-2xl space-y-3"> {/* Changed max-w-md to max-w-2xl */}
+        <div className="w-full max-w-4xl space-y-3"> {/* Changed max-w-2xl to max-w-4xl */}
           {habitsHistory.length === 0 ? (
             <div className="text-center text-muted-foreground p-8 bg-card border border-border rounded-xl shadow-lg flex flex-col items-center justify-center">
               <Sparkles className="h-12 w-12 text-primary mb-4" />
@@ -259,9 +253,8 @@ const History: React.FC = () => {
         </div>
       )}
 
-      {/* Statistics Tab Content */}
       {activeTab === 'statistics' && (
-        <div className="w-full max-w-2xl space-y-6"> {/* Changed max-w-md to max-w-2xl */}
+        <div className="w-full max-w-4xl space-y-6"> {/* Changed max-w-2xl to max-w-4xl */}
           <OverallStatsCards
             totalCompletions={totalCompletions}
             longestStreakEver={longestStreakEver}
@@ -301,14 +294,13 @@ const History: React.FC = () => {
             onTimeRangeChange={setMonthlyTimeRange}
             onNavigateDates={(direction) => setMonthlyDateOffset(prev => direction === 'prev' ? prev + 1 : Math.max(0, prev - 1))}
             dateRangeLabel={getMonthlyDateRangeLabel()}
-            chartType="daily" // Using 'daily' for formatting as it's date-based, not week-based
+            chartType="daily"
           />
         </div>
       )}
 
-      {/* Archived Tab Content */}
       {activeTab === 'archived' && (
-        <div className="w-full max-w-2xl space-y-6"> {/* Changed max-w-md to max-w-2xl */}
+        <div className="w-full max-w-4xl space-y-6"> {/* Changed max-w-2xl to max-w-4xl */}
           <div className="bg-card border border-border rounded-xl shadow-lg p-6">
             <h2 className="text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
               <Archive className="h-5 w-5" />

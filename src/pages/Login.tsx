@@ -6,11 +6,11 @@ import { supabase } from '@/integrations/supabase/client';
 const Login: React.FC = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <div className="w-full max-w-2xl p-8 bg-card border border-border rounded-lg shadow-lg"> {/* Changed max-w-md to max-w-2xl */}
+      <div className="w-full max-w-4xl p-8 bg-card border border-border rounded-lg shadow-lg"> {/* Changed max-w-2xl to max-w-4xl */}
         <h1 className="text-3xl font-bold text-center text-foreground mb-6">Welcome to HabitKit</h1>
         <Auth
           supabaseClient={supabase}
-          providers={['google']} // Enable Google authentication
+          providers={['google']}
           appearance={{
             theme: ThemeSupa,
             variables: {
@@ -25,13 +25,13 @@ const Login: React.FC = () => {
                   defaultButtonBackground: 'hsl(var(--secondary))',
                   defaultButtonBorder: 'hsl(var(--border))',
                   defaultButtonText: 'hsl(var(--secondary-foreground))',
-                  defaultButtonBackgroundHover: 'hsl(var(--accent))', // Changed to accent for better dark mode hover
+                  defaultButtonBackgroundHover: 'hsl(var(--accent))',
                 },
               },
             },
           }}
-          theme="dark" // Using dark theme for Auth UI to match app's dark mode
-          redirectTo={window.location.origin} // Use dynamic origin for redirect
+          theme="dark"
+          redirectTo={window.location.origin}
         />
       </div>
     </div>

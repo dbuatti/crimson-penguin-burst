@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { getHabits, updateHabit, deleteHabit, toggleHabitCompletion, incrementHabitCompletion, decrementHabitCompletion } from '@/lib/habit-storage';
 import { Habit } from '@/types/habit';
-import { Plus, Sparkles } from 'lucide-react'; // Removed Edit icon import
+import { Plus, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { showSuccess, showError } from '@/utils/toast';
 import { useSession } from '@/components/SessionContextProvider';
@@ -109,7 +109,7 @@ const Index = () => {
   return (
     <>
       {habits.length === 0 ? (
-        <div className="text-center text-muted-foreground mt-6 p-8 bg-card border border-border rounded-xl shadow-lg flex flex-col items-center justify-center max-w-2xl"> {/* Added max-w-2xl */}
+        <div className="text-center text-muted-foreground mt-6 p-8 bg-card border border-border rounded-xl shadow-lg flex flex-col items-center justify-center max-w-4xl"> {/* Changed max-w-2xl to max-w-4xl */}
           <Sparkles className="h-12 w-12 text-primary mb-4" />
           <p className="text-xl font-semibold mb-4">No habits yet. Let's build some good routines!</p>
           <Link to="/create-habit">
@@ -120,10 +120,9 @@ const Index = () => {
         </div>
       ) : (
         <>
-          <div className="w-full max-w-2xl flex items-center justify-between mt-4 mb-2"> {/* Added max-w-2xl */}
+          <div className="w-full max-w-4xl flex items-center justify-between mt-4 mb-2"> {/* Changed max-w-2xl to max-w-4xl */}
             <h1 className="text-3xl font-extrabold text-foreground tracking-tight">Today</h1>
             <div className="flex space-x-2">
-              {/* Removed the Edit button */}
               <Link to="/create-habit">
                 <Button variant="ghost" size="icon" className="text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors duration-200 rounded-lg">
                   <Plus className="h-5 w-5" />
@@ -132,16 +131,15 @@ const Index = () => {
             </div>
           </div>
 
-          {/* Overall Daily Progress Circle */}
-          <div className="flex justify-center mb-4 max-w-2xl w-full"> {/* Added max-w-2xl and w-full */}
+          <div className="flex justify-center mb-4 max-w-4xl w-full"> {/* Changed max-w-2xl to max-w-4xl */}
             <div className="relative flex items-center justify-center">
               <CircularProgress
                 percentage={overallDailyProgress}
                 size={128}
                 strokeWidth={12}
                 gradientId="dailyProgressGradient"
-                startColor="#8338EC" // Purple
-                endColor="#3A86FF"   // Blue
+                startColor="#8338EC"
+                endColor="#3A86FF"
               >
                 <span className="text-3xl font-bold text-foreground">
                   {overallDailyProgress}%
@@ -150,8 +148,7 @@ const Index = () => {
             </div>
           </div>
 
-          {/* Today's Habits */}
-          <div className="space-y-3 mb-4 w-full max-w-2xl"> {/* Added max-w-2xl */}
+          <div className="space-y-3 mb-4 w-full max-w-4xl"> {/* Changed max-w-2xl to max-w-4xl */}
             {todayHabits.map((habit) => (
               <HabitListItem
                 key={habit.id}
@@ -166,11 +163,10 @@ const Index = () => {
             ))}
           </div>
 
-          {/* Weekly/Monthly Goals */}
           {weeklyMonthlyHabits.length > 0 && (
             <>
-              <h2 className="text-2xl font-extrabold text-foreground tracking-tight mb-4 mt-6 w-full max-w-2xl">Weekly goals</h2> {/* Added max-w-2xl */}
-              <div className="space-y-3 mb-4 w-full max-w-2xl"> {/* Added max-w-2xl */}
+              <h2 className="text-2xl font-extrabold text-foreground tracking-tight mb-4 mt-6 w-full max-w-4xl">Weekly goals</h2> {/* Changed max-w-2xl to max-w-4xl */}
+              <div className="space-y-3 mb-4 w-full max-w-4xl"> {/* Changed max-w-2xl to max-w-4xl */}
                 {weeklyMonthlyHabits.map((habit) => (
                   <HabitListItem
                     key={habit.id}

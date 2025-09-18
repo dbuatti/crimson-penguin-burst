@@ -5,8 +5,8 @@ import { Habit } from '@/types/habit';
 import HabitCard from '@/components/HabitCard';
 import { Button } from '@/components/ui/button';
 import { showSuccess, showError } from '@/utils/toast';
-import { Trash2, Sparkles } from 'lucide-react'; // Only Trash2 and Sparkles are needed for buttons/empty state
-import PageHeader from '@/components/PageHeader'; // Import the new PageHeader
+import { Trash2, Sparkles } from 'lucide-react';
+import PageHeader from '@/components/PageHeader';
 import { useSession } from '@/components/SessionContextProvider';
 
 const ArchivedHabits: React.FC = () => {
@@ -30,7 +30,7 @@ const ArchivedHabits: React.FC = () => {
   }, [fetchArchivedHabits, sessionLoading]);
 
   const handleHabitUpdate = () => {
-    fetchArchivedHabits(); // Re-fetch habits after any update (e.g., unarchive)
+    fetchArchivedHabits();
   };
 
   const handleUnarchiveHabit = async (id: string) => {
@@ -69,9 +69,9 @@ const ArchivedHabits: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground p-6 flex flex-col items-center">
-      <PageHeader title="Archived Habits" backLink="/" /> {/* Use PageHeader */}
+      <PageHeader title="Archived Habits" backLink="/" />
 
-      <div className="w-full max-w-2xl space-y-4 mb-8"> {/* Changed max-w-md to max-w-2xl */}
+      <div className="w-full max-w-4xl space-y-4 mb-8"> {/* Changed max-w-2xl to max-w-4xl */}
         {archivedHabits.length === 0 ? (
           <div className="text-center text-muted-foreground mt-12 p-6 bg-card border border-border rounded-xl shadow-md flex flex-col items-center justify-center">
             <Sparkles className="h-12 w-12 text-primary mb-4" />

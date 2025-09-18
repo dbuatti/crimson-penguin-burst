@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation } => 'react-router-dom';
 import { cn } from '@/lib/utils';
 
 interface SegmentedControlProps {
@@ -39,9 +39,7 @@ const TopNavigation: React.FC = () => {
   ];
 
   return (
-    <header className="w-full max-w-2xl flex flex-col items-center py-2 px-4"> {/* Changed max-w-md to max-w-2xl */}
-      {/* Removed HabitKit title */}
-      {/* Removed ThemeToggle and data management dropdown */}
+    <header className="w-full max-w-4xl flex flex-col items-center py-2 px-4"> {/* Changed max-w-2xl to max-w-4xl */}
       <SegmentedControl segments={segments} />
     </header>
   );

@@ -1,12 +1,11 @@
 import React from 'react';
-// Removed PageHeader import
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Archive, Upload, Download } from 'lucide-react';
-import { ThemeToggle } from '@/components/ThemeToggle'; // Import ThemeToggle
-import { useSession } from '@/components/SessionContextProvider'; // Import useSession
-import { exportHabits, importHabits } from '@/lib/data-management'; // Import data management functions
-import { showError, showSuccess } from '@/utils/toast'; // Import toast notifications
+import { ThemeToggle } from '@/components/ThemeToggle';
+import { useSession } from '@/components/SessionContextProvider';
+import { exportHabits, importHabits } from '@/lib/data-management';
+import { showError, showSuccess } from '@/utils/toast';
 
 const Settings: React.FC = () => {
   const { session } = useSession();
@@ -20,7 +19,6 @@ const Settings: React.FC = () => {
     if (file) {
       try {
         await importHabits(file, session);
-        // No need to fetch habits here, the Index page will re-fetch on mount
       } catch (error) {
         console.error('Failed to import habits:', error);
       }
@@ -29,8 +27,7 @@ const Settings: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground p-6 flex flex-col items-center">
-      <div className="w-full max-w-2xl space-y-3 p-4 bg-card border border-border rounded-xl shadow-lg mt-4"> {/* Changed max-w-md to max-w-2xl */}
-        {/* Removed the "General Settings" h2 header */}
+      <div className="w-full max-w-4xl space-y-3 p-4 bg-card border border-border rounded-xl shadow-lg mt-4"> {/* Changed max-w-2xl to max-w-4xl */}
         
         <div className="flex items-center justify-between py-2">
           <span className="text-foreground">Theme</span>
