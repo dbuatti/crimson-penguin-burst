@@ -26,7 +26,6 @@ const Login: React.FC = () => {
                   defaultButtonBorder: 'hsl(var(--border))',
                   defaultButtonText: 'hsl(var(--secondary-foreground))',
                   defaultButtonBackgroundHover: 'hsl(var(--secondary-foreground))',
-                  defaultButtonTextHover: 'hsl(var(--secondary))',
                 },
               },
             },
