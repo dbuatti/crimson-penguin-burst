@@ -9,6 +9,6 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
-    debug: true, // Added debug mode
+    // Removed debug mode
   },
 });

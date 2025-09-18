@@ -19,47 +19,24 @@ export const SessionContextProvider: React.FC<{ children: React.ReactNode }> = (
 
   useEffect(() => {
     console.log('SessionContextProvider: useEffect started');
+    setLoading(true); // Ensure loading is true at the start of effect
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, currentSession) => {
       console.log('SessionContextProvider: onAuthStateChange event:', _event, 'currentSession:', currentSession);
-      // Always re-fetch the session to ensure we have the latest state from Supabase
-      const { data: { session: latestSession }, error: getSessionError } = await supabase.auth.getSession();
-      if (getSessionError) {
-        console.error('SessionContextProvider: Error re-fetching session in onAuthStateChange:', getSessionError);
-      }
-      console.log('SessionContextProvider: onAuthStateChange latestSession:', latestSession);
-      setSession(latestSession);
-      setLoading(false);
+      setSession(currentSession);
+      setLoading(false); // Set loading to false once the session state is determined
 
-      if (latestSession && location.pathname === '/login') {
+      if (currentSession && location.pathname === '/login') {
         console.log('SessionContextProvider: Redirecting from /login to /');
         navigate('/'); // Redirect authenticated users from login page to home
-      } else if (!latestSession && location.pathname !== '/login') {
+      } else if (!currentSession && location.pathname !== '/login') {
         console.log('SessionContextProvider: Redirecting to /login');
         navigate('/login'); // Redirect unauthenticated users to login page
       }
     });
 
-    // Initial session check
-    console.log('SessionContextProvider: Initial getSession() call');
-    supabase.auth.getSession().then(({ data: { session: initialSession }, error: initialGetSessionError }) => {
-      if (initialGetSessionError) {
-        console.error('SessionContextProvider: Error initial getSession:', initialGetSessionError);
-      }
-      console.log('SessionContextProvider: Initial session:', initialSession);
-      setSession(initialSession);
-      setLoading(false);
-      if (initialSession && location.pathname === '/login') {
-        console.log('SessionContextProvider: Initial redirect from /login to /');
-        navigate('/');
-      } else if (!initialSession && location.pathname !== '/login') {
-        console.log('SessionContextProvider: Initial redirect to /login');
-        navigate('/login');
-      }
-    }).catch(error => {
-      console.error('SessionContextProvider: Catch block for initial getSession:', error);
-      setLoading(false); // Ensure loading is set to false even on error
-    });
+    // The onAuthStateChange listener handles the initial session state,
+    // so a separate getSession() call here is not needed.
 
     return () => {
       console.log('SessionContextProvider: useEffect cleanup, unsubscribing');
