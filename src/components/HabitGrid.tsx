@@ -1,6 +1,6 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { format, startOfWeek, addDays, subWeeks, isSameDay } from 'date-fns';
+import { format, startOfWeek, addDays, subWeeks, isSameDay, isFirstDayOfMonth } from 'date-fns';
 
 interface HabitGridProps {
   completionDates: string[];
@@ -25,8 +25,31 @@ const HabitGrid: React.FC<HabitGridProps> = ({
     dates.push(addDays(firstMondayToDisplay, i));
   }
 
+  // Generate month labels for the header
+  const monthLabels: (string | null)[] = Array(7).fill(null);
+  for (let i = 0; i < 7; i++) {
+    const date = dates[i]; // Check the first 7 days (first week)
+    if (isFirstDayOfMonth(date)) {
+      monthLabels[i] = format(date, 'MMM');
+    }
+  }
+
   return (
-    <div className="px-3 pb-3 pt-6 rounded-md bg-secondary border border-border overflow-hidden"> {/* Adjusted padding-top here */}
+    <div className="px-3 pb-3 pt-6 rounded-md bg-secondary border border-border overflow-hidden">
+      {/* Month Header */}
+      <div className="grid grid-cols-7 gap-1 mb-2 py-1"> {/* Added py-1 for vertical spacing */}
+        {monthLabels.map((month, index) => (
+          <div key={`month-${index}`} className="w-5 h-5 flex items-center justify-center">
+            {month && (
+              <span className="text-[8px] font-bold uppercase text-muted-foreground">
+                {month}
+              </span>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* Habit Completion Grid */}
       <div className="grid grid-cols-7 gap-1">
         {dates.map((date, index) => {
           const dateFormatted = format(date, 'yyyy-MM-dd');
@@ -35,18 +58,12 @@ const HabitGrid: React.FC<HabitGridProps> = ({
           const isFuture = date > today;
           const isCurrentDay = isSameDay(date, today);
           const dayOfMonth = format(date, 'd');
-          const isFirstDayOfMonth = date.getDate() === 1;
 
           return (
             <div
               key={index}
               className="relative w-5 h-5" // Fixed size for the grid cell
             >
-              {isFirstDayOfMonth && (
-                <div className="absolute bottom-full mb-1 left-1/2 -translate-x-1/2 text-[8px] font-bold uppercase text-muted-foreground whitespace-nowrap z-10"> {/* Adjusted positioning */}
-                  {format(date, 'MMM')}
-                </div>
-              )}
               <div
                 className={cn(
                   "w-full h-full rounded-sm flex items-center justify-center transition-all duration-200", // Fill the parent div
