@@ -8,26 +8,27 @@ import { showSuccess, showError } from '@/utils/toast';
 import { useSession } from '@/components/SessionContextProvider';
 import HabitListItem from '@/components/HabitListItem';
 import CircularProgress from '@/components/CircularProgress';
+import HabitListItemSkeleton from '@/components/HabitListItemSkeleton'; // Import the new skeleton component
 
 const Index = () => {
   const [habits, setHabits] = useState<Habit[]>([]);
-  const [isLoadingHabits, setIsLoadingHabits] = useState(true); // New loading state for habits
+  const [isLoadingHabits, setIsLoadingHabits] = useState(true);
   const { session, loading: sessionLoading } = useSession();
 
   const fetchHabits = useCallback(async () => {
     if (session) {
-      setIsLoadingHabits(true); // Set loading true before fetching
+      setIsLoadingHabits(true);
       const allHabits = await getHabits(session);
       setHabits(allHabits.filter(h => !h.archived));
-      setIsLoadingHabits(false); // Set loading false after fetching
+      setIsLoadingHabits(false);
     } else {
       setHabits([]);
-      setIsLoadingHabits(false); // Also set false if no session
+      setIsLoadingHabits(false);
     }
   }, [session]);
 
   useEffect(() => {
-    if (!sessionLoading) { // Only fetch habits once session loading is complete
+    if (!sessionLoading) {
       fetchHabits();
     }
   }, [fetchHabits, sessionLoading]);
@@ -102,10 +103,21 @@ const Index = () => {
   const completedDailyHabits = todayHabits.filter(h => h.isCompletedToday).length;
   const overallDailyProgress = totalDailyHabits > 0 ? Math.round((completedDailyHabits / totalDailyHabits) * 100) : 0;
 
-  if (sessionLoading || isLoadingHabits) { // Show loading if either session or habits are loading
+  if (sessionLoading || isLoadingHabits) {
     return (
-      <div className="min-h-screen bg-background text-foreground p-6 flex items-center justify-center">
-        Loading...
+      <div className="min-h-screen bg-background text-foreground p-6 flex flex-col items-center w-full max-w-4xl">
+        <div className="w-full max-w-4xl flex items-center justify-between mt-4 mb-2">
+          <Skeleton className="h-8 w-32" />
+          <Skeleton className="h-9 w-9 rounded-lg" />
+        </div>
+        <div className="flex justify-center mb-4 max-w-4xl w-full">
+          <Skeleton className="h-32 w-32 rounded-full" />
+        </div>
+        <div className="space-y-3 mb-4 w-full max-w-4xl">
+          {Array.from({ length: 3 }).map((_, i) => ( // Render 3 skeleton items
+            <HabitListItemSkeleton key={i} />
+          ))}
+        </div>
       </div>
     );
   }
