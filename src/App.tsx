@@ -8,7 +8,9 @@ import NotFound from "./pages/NotFound";
 import CreateHabit from "./pages/CreateHabit";
 import EditHabit from "./pages/EditHabit";
 import HabitCalendar from "./pages/HabitCalendar";
-import ArchivedHabits from "./pages/ArchivedHabits"; // Import the new archived habits page
+import ArchivedHabits from "./pages/ArchivedHabits";
+import Login from "./pages/Login"; // Import the new Login page
+import { SessionContextProvider } from "./components/SessionContextProvider"; // Import the new SessionContextProvider
 
 const queryClient = new QueryClient();
 
@@ -18,15 +20,18 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/create-habit" element={<CreateHabit />} />
-          <Route path="/edit-habit/:id" element={<EditHabit />} />
-          <Route path="/habit-calendar/:id" element={<HabitCalendar />} />
-          <Route path="/archived-habits" element={<ArchivedHabits />} /> {/* New route for archived habits */}
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <SessionContextProvider> {/* Wrap the entire app with SessionContextProvider */}
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/login" element={<Login />} /> {/* Add the login route */}
+            <Route path="/create-habit" element={<CreateHabit />} />
+            <Route path="/edit-habit/:id" element={<EditHabit />} />
+            <Route path="/habit-calendar/:id" element={<HabitCalendar />} />
+            <Route path="/archived-habits" element={<ArchivedHabits />} />
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </SessionContextProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

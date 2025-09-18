@@ -4,7 +4,7 @@ import { getHabits, updateHabit, deleteHabit } from '@/lib/habit-storage';
 import { Habit } from '@/types/habit';
 import HabitCard from '@/components/HabitCard';
 import { MadeWithDyad } from "@/components/made-with-dyad";
-import { Plus, Settings, Archive, Check, Upload, Download, X } from 'lucide-react';
+import { Plus, Settings, Archive, Check, Upload, Download, X, LogOut } from 'lucide-react'; // Import LogOut icon
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import {
@@ -14,9 +14,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { exportHabits, importHabits } from '@/lib/data-management';
+import { useSession } from '@/components/SessionContextProvider'; // Import useSession
 
 const Index = () => {
   const [habits, setHabits] = useState<Habit[]>([]);
+  const { supabase, session } = useSession(); // Use the session context
 
   const fetchHabits = useCallback(() => {
     const allHabits = getHabits();
@@ -78,6 +80,20 @@ const Index = () => {
     }
   };
 
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      toast.error('Failed to log out.', {
+        icon: <X className="h-4 w-4" />,
+      });
+      console.error('Logout error:', error);
+    } else {
+      toast.success('Logged out successfully!', {
+        icon: <Check className="h-4 w-4" />,
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground p-4 flex flex-col items-center">
       <div className="w-full max-w-md">
@@ -106,6 +122,11 @@ const Index = () => {
                   className="absolute inset-0 opacity-0 cursor-pointer"
                 />
               </DropdownMenuItem>
+              {session && (
+                <DropdownMenuItem onClick={handleLogout} className="flex items-center text-destructive hover:bg-destructive/10 hover:text-destructive transition-colors duration-150">
+                  <LogOut className="mr-2 h-4 w-4" /> Logout
+                </DropdownMenuItem>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
 
