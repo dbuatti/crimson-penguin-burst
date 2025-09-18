@@ -301,7 +301,7 @@ const History: React.FC = () => {
             onTimeRangeChange={setMonthlyTimeRange}
             onNavigateDates={(direction) => setMonthlyDateOffset(prev => direction === 'prev' ? prev + 1 : Math.max(0, prev - 1))}
             dateRangeLabel={getMonthlyDateRangeLabel()}
-            chartType="daily" {/* Using 'daily' for formatting as it's date-based, not week-based */}
+            chartType="daily" // Using 'daily' for formatting as it's date-based, not week-based
           />
         </div>
       )}
