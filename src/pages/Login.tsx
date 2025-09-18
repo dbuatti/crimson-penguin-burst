@@ -31,7 +31,7 @@ const Login: React.FC = () => {
             },
           }}
           theme="dark" // Using dark theme for Auth UI to match app's dark mode
-          redirectTo="https://crimson-penguin-burst.vercel.app/" // Changed to the Vercel deployment URL
+          redirectTo={window.location.origin} // Use dynamic origin for redirect
         />
       </div>
     </div>
