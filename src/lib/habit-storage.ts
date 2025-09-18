@@ -1,6 +1,7 @@
 import { Habit, HabitId, HabitFormData } from "@/types/habit";
 import { supabase } from '@/integrations/supabase/client';
 import { Session } from '@supabase/supabase-js';
+import { format } from 'date-fns';
 
 // Helper to get the current user's ID
 const getUserId = (session: Session | null): string | null => {
@@ -18,7 +19,6 @@ const mapSupabaseHabitToAppHabit = (data: any): Habit => ({
   goalType: data.goal_type,
   goalValue: data.goal_value,
   reminders: data.reminders,
-  completionDates: data.completion_dates,
   createdAt: data.created_at,
   updatedAt: data.updated_at,
   archived: data.archived,
@@ -29,17 +29,59 @@ export const getHabits = async (session: Session | null): Promise<Habit[]> => {
   if (!userId) return [];
 
   try {
-    const { data, error } = await supabase
+    const { data: habitsData, error: habitsError } = await supabase
       .from('habits')
       .select('*')
       .eq('user_id', userId)
       .order('created_at', { ascending: true });
 
-    if (error) {
-      console.error("Failed to load habits from Supabase:", error);
+    if (habitsError) {
+      console.error("Failed to load habits from Supabase:", habitsError);
       return [];
     }
-    return (data || []).map(mapSupabaseHabitToAppHabit);
+
+    const today = format(new Date(), 'yyyy-MM-dd');
+    const habitsWithCompletion: Habit[] = [];
+
+    for (const habitData of (habitsData || [])) {
+      const mappedHabit = mapSupabaseHabitToAppHabit(habitData);
+
+      // Fetch today's completion count from habit_logs
+      const { data: logsData, error: logsError } = await supabase
+        .from('habit_logs')
+        .select('id, is_completed, value_recorded')
+        .eq('habit_id', mappedHabit.id)
+        .eq('user_id', userId)
+        .eq('log_date', today);
+
+      if (logsError) {
+        console.error(`Failed to load habit logs for habit ${mappedHabit.id}:`, logsError);
+        // Continue without completion data if there's an error
+        habitsWithCompletion.push(mappedHabit);
+        continue;
+      }
+
+      let currentCompletionCount = 0;
+      let isCompletedToday = false;
+
+      if (mappedHabit.goalType === 'daily' && mappedHabit.goalValue === 1) {
+        // For simple daily habits, check if any log exists for today
+        isCompletedToday = (logsData || []).some(log => log.is_completed);
+        currentCompletionCount = isCompletedToday ? 1 : 0;
+      } else {
+        // For goal-based habits, sum up value_recorded
+        currentCompletionCount = (logsData || []).reduce((sum, log) => sum + (log.value_recorded || 0), 0);
+        isCompletedToday = currentCompletionCount >= mappedHabit.goalValue;
+      }
+
+      habitsWithCompletion.push({
+        ...mappedHabit,
+        currentCompletionCount,
+        isCompletedToday,
+      });
+    }
+
+    return habitsWithCompletion;
   } catch (error) {
     console.error("Failed to load habits from Supabase:", error);
     return [];
@@ -62,7 +104,6 @@ export const addHabit = async (newHabitData: HabitFormData, session: Session | n
         goal_type: newHabitData.goalType,
         goal_value: newHabitData.goalValue,
         reminders: newHabitData.reminders,
-        completion_dates: [],
         archived: false,
       })
       .select()
@@ -94,7 +135,6 @@ export const updateHabit = async (updatedHabit: Habit, session: Session | null):
         goal_type: updatedHabit.goalType,
         goal_value: updatedHabit.goalValue,
         reminders: updatedHabit.reminders,
-        completion_dates: updatedHabit.completionDates,
         archived: updatedHabit.archived,
       })
       .eq('id', updatedHabit.id)
@@ -118,14 +158,27 @@ export const deleteHabit = async (id: HabitId, session: Session | null): Promise
   if (!userId) return false;
 
   try {
-    const { error } = await supabase
+    // Delete associated habit logs first
+    const { error: deleteLogsError } = await supabase
+      .from('habit_logs')
+      .delete()
+      .eq('habit_id', id)
+      .eq('user_id', userId);
+
+    if (deleteLogsError) {
+      console.error("Failed to delete habit logs from Supabase:", deleteLogsError);
+      return false;
+    }
+
+    // Then delete the habit itself
+    const { error: deleteHabitError } = await supabase
       .from('habits')
       .delete()
       .eq('id', id)
       .eq('user_id', userId);
 
-    if (error) {
-      console.error("Failed to delete habit from Supabase:", error);
+    if (deleteHabitError) {
+      console.error("Failed to delete habit from Supabase:", deleteHabitError);
       return false;
     }
     return true;
@@ -158,49 +211,127 @@ export const getHabitById = async (id: HabitId, session: Session | null): Promis
   }
 };
 
-export const toggleHabitCompletion = async (habitId: HabitId, date: string, session: Session | null): Promise<boolean> => {
+export const toggleHabitCompletion = async (habitId: HabitId, dateString: string, session: Session | null): Promise<boolean> => {
   const userId = getUserId(session);
   if (!userId) return false;
 
   try {
-    const { data: currentHabit, error: fetchError } = await supabase
-      .from('habits')
-      .select('completion_dates')
-      .eq('id', habitId)
+    // For simple daily habits (goalValue = 1), we toggle a single log entry
+    const { data: existingLogs, error: fetchError } = await supabase
+      .from('habit_logs')
+      .select('id')
+      .eq('habit_id', habitId)
       .eq('user_id', userId)
-      .single();
+      .eq('log_date', dateString)
+      .eq('is_completed', true); // Only consider 'completed' logs for toggling
 
-    if (fetchError || !currentHabit) {
-      console.error("Failed to fetch habit for toggling completion:", fetchError);
+    if (fetchError) {
+      console.error("Failed to fetch existing habit logs:", fetchError);
       return false;
     }
 
-    const currentCompletionDates: string[] = currentHabit.completion_dates || [];
-    const dateIndex = currentCompletionDates.indexOf(date);
-    let newCompletionDates: string[];
+    if (existingLogs && existingLogs.length > 0) {
+      // If a log exists, delete it (unmark as completed)
+      const { error: deleteError } = await supabase
+        .from('habit_logs')
+        .delete()
+        .eq('id', existingLogs[0].id); // Delete the first found log for that day
 
-    if (dateIndex !== -1) {
-      newCompletionDates = currentCompletionDates.filter((d) => d !== date); // Remove if already present
+      if (deleteError) {
+        console.error("Failed to delete habit log:", deleteError);
+        return false;
+      }
     } else {
-      newCompletionDates = [...currentCompletionDates, date]; // Add if not present
+      // If no log exists, insert one (mark as completed)
+      const { error: insertError } = await supabase
+        .from('habit_logs')
+        .insert({
+          user_id: userId,
+          habit_id: habitId,
+          log_date: dateString,
+          is_completed: true,
+          value_recorded: 1, // Default to 1 for simple toggle
+        });
+
+      if (insertError) {
+        console.error("Failed to insert habit log:", insertError);
+        return false;
+      }
     }
+    return true;
+  } catch (error) {
+    console.error("Failed to toggle habit completion:", error);
+    return false;
+  }
+};
 
-    const { error: updateError } = await supabase
-      .from('habits')
-      .update({ completion_dates: newCompletionDates })
-      .eq('id', habitId)
-      .eq('user_id', userId);
+export const incrementHabitCompletion = async (habitId: HabitId, dateString: string, session: Session | null): Promise<boolean> => {
+  const userId = getUserId(session);
+  if (!userId) return false;
 
-    if (updateError) {
-      console.error("Failed to toggle habit completion in Supabase:", updateError);
+  try {
+    const { error } = await supabase
+      .from('habit_logs')
+      .insert({
+        user_id: userId,
+        habit_id: habitId,
+        log_date: dateString,
+        is_completed: true, // Always true for incremented completions
+        value_recorded: 1, // Increment by 1
+      });
+
+    if (error) {
+      console.error("Failed to increment habit completion:", error);
       return false;
     }
     return true;
   } catch (error) {
-    console.error("Failed to toggle habit completion in Supabase:", error);
+    console.error("Failed to increment habit completion:", error);
     return false;
   }
 };
+
+export const decrementHabitCompletion = async (habitId: HabitId, dateString: string, session: Session | null): Promise<boolean> => {
+  const userId = getUserId(session);
+  if (!userId) return false;
+
+  try {
+    // Find the most recent log entry for this habit on this date to delete
+    const { data: existingLogs, error: fetchError } = await supabase
+      .from('habit_logs')
+      .select('id')
+      .eq('habit_id', habitId)
+      .eq('user_id', userId)
+      .eq('log_date', dateString)
+      .order('created_at', { ascending: false }) // Get the most recent one
+      .limit(1);
+
+    if (fetchError) {
+      console.error("Failed to fetch existing habit logs for decrement:", fetchError);
+      return false;
+    }
+
+    if (existingLogs && existingLogs.length > 0) {
+      const { error: deleteError } = await supabase
+        .from('habit_logs')
+        .delete()
+        .eq('id', existingLogs[0].id);
+
+      if (deleteError) {
+        console.error("Failed to decrement habit completion:", deleteError);
+        return false;
+      }
+      return true;
+    } else {
+      // No logs to decrement
+      return false;
+    }
+  } catch (error) {
+    console.error("Failed to decrement habit completion:", error);
+    return false;
+  }
+};
+
 
 // The local storage functions are no longer needed for core habit management
 // but export/import will still use them for local file operations.

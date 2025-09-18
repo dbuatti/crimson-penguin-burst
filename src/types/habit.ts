@@ -2,18 +2,20 @@ export type HabitId = string;
 
 export interface Habit {
   id: HabitId;
-  user_id: string; // Added user_id
+  user_id: string;
   name: string;
   description?: string;
-  icon: string; // Storing icon name (e.g., 'dumbbell', 'code')
-  color: string; // Storing hex color string
-  goalType: 'daily' | 'weekly' | 'monthly'; // Stored as goal_type in DB
-  goalValue: number; // e.g., 1 for daily, 3 for 3 times a week
-  reminders: string[]; // Array of time strings (e.g., '09:00', '18:30')
-  completionDates: string[]; // Array of 'YYYY-MM-DD' strings, stored as completion_dates in DB
-  createdAt: string; // ISO date string
-  updatedAt: string; // ISO date string, added for DB
+  icon: string;
+  color: string;
+  goalType: 'daily' | 'weekly' | 'monthly';
+  goalValue: number;
+  reminders: string[];
+  createdAt: string;
+  updatedAt: string;
   archived: boolean;
+  // New fields for UI display, derived from habit_logs
+  currentCompletionCount?: number;
+  isCompletedToday?: boolean;
 }
 
 export interface HabitFormData {

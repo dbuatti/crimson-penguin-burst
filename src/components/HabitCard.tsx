@@ -1,40 +1,25 @@
 import React from 'react';
 import { Habit } from '@/types/habit';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Link } from 'react-router-dom';
 import { Edit, CalendarDays, Archive, Share2, Trash2, MoreVertical, Circle } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import HabitGrid from './HabitGrid';
-import { toggleHabitCompletion } from '@/lib/habit-storage';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useSession } from '@/components/SessionContextProvider';
 
 interface HabitCardProps {
   habit: Habit;
-  onHabitUpdate: () => void;
-  onArchiveHabit: (id: string) => void;
+  onHabitUpdate: () => void; // Still needed for re-fetching after unarchive
+  onArchiveHabit: (id: string) => void; // For unarchiving
   onDeleteHabit: (id: string) => void;
 }
 
 const HabitCard: React.FC<HabitCardProps> = ({ habit, onHabitUpdate, onArchiveHabit, onDeleteHabit }) => {
-  const { session } = useSession();
-  const today = new Date().toISOString().split('T')[0];
-  const isCompletedToday = habit.completionDates.includes(today);
-
-  const handleToggleCompletion = async (dateString: string) => {
-    const success = await toggleHabitCompletion(habit.id, dateString, session);
-    if (success) {
-      onHabitUpdate(); // Notify parent to re-fetch habits
-    }
-  };
-
   const IconComponent = React.useMemo(() => {
     const RequestedIcon = (LucideIcons as any)[habit.icon];
     if (RequestedIcon) {
@@ -57,18 +42,6 @@ const HabitCard: React.FC<HabitCardProps> = ({ habit, onHabitUpdate, onArchiveHa
           </div>
         </div>
         <div className="flex items-center space-x-2">
-          <Checkbox
-            id={`habit-${habit.id}`}
-            checked={isCompletedToday}
-            onCheckedChange={() => handleToggleCompletion(today)}
-            className="h-6 w-6 rounded-full border-2 transition-colors duration-200
-                       data-[state=unchecked]:bg-secondary data-[state=unchecked]:border-border 
-                       data-[state=checked]:text-primary-foreground"
-            style={{ 
-              backgroundColor: isCompletedToday ? habit.color : undefined, 
-              borderColor: isCompletedToday ? habit.color : undefined 
-            }}
-          />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors duration-200 rounded-lg">
@@ -99,12 +72,9 @@ const HabitCard: React.FC<HabitCardProps> = ({ habit, onHabitUpdate, onArchiveHa
           </DropdownMenu>
         </div>
       </CardHeader>
-      <CardContent className="p-5 pt-0">
-        <HabitGrid 
-          completionDates={habit.completionDates} 
-          habitColor={habit.color} 
-          onToggleCompletion={handleToggleCompletion}
-        />
+      {/* Removed HabitGrid from here */}
+      <CardContent className="p-5 pt-0 text-muted-foreground text-sm">
+        This habit is archived. Unarchive it to track its progress.
       </CardContent>
     </Card>
   );

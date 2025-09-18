@@ -1,8 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { getHabits, updateHabit, deleteHabit } from '@/lib/habit-storage';
+import { getHabits, updateHabit, deleteHabit, toggleHabitCompletion, incrementHabitCompletion, decrementHabitCompletion } from '@/lib/habit-storage';
 import { Habit } from '@/types/habit';
-import HabitCard from '@/components/HabitCard';
 import { MadeWithDyad } from "@/components/made-with-dyad";
 import { Plus, Settings, Archive, Upload, Download, LogOut, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -16,6 +15,9 @@ import {
 import { exportHabits, importHabits } from '@/lib/data-management';
 import { useSession } from '@/components/SessionContextProvider';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import HabitListItem from '@/components/HabitListItem'; // New component
+import { Progress } from '@/components/ui/progress'; // For the main progress circle
+import { cn } from '@/lib/utils';
 
 const Index = () => {
   const [habits, setHabits] = useState<Habit[]>([]);
@@ -96,6 +98,13 @@ const Index = () => {
     window.location.reload();
   };
 
+  const todayHabits = habits.filter(h => h.goalType === 'daily');
+  const weeklyMonthlyHabits = habits.filter(h => h.goalType === 'weekly' || h.goalType === 'monthly');
+
+  const totalDailyHabits = todayHabits.length;
+  const completedDailyHabits = todayHabits.filter(h => h.isCompletedToday).length;
+  const overallDailyProgress = totalDailyHabits > 0 ? Math.round((completedDailyHabits / totalDailyHabits) * 100) : 0;
+
   if (sessionLoading) {
     return (
       <div className="min-h-screen bg-background text-foreground p-6 flex items-center justify-center">
@@ -106,8 +115,9 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground p-6 flex flex-col items-center">
-      <div className="w-full max-w-4xl"> {/* Increased max-w for wider grid */}
-        <header className="flex justify-between items-center mb-8 py-2 px-4 bg-card border border-border rounded-xl shadow-lg">
+      <div className="w-full max-w-md">
+        <header className="flex justify-between items-center mb-8 py-2 px-4">
+          <h1 className="text-3xl font-extrabold text-foreground tracking-tight">Today</h1>
           <div className="flex items-center space-x-2">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -115,7 +125,7 @@ const Index = () => {
                   <Settings className="h-5 w-5" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="bg-popover border-border text-foreground shadow-lg rounded-lg p-1">
+              <DropdownMenuContent align="end" className="bg-popover border-border text-foreground shadow-lg rounded-lg p-1">
                 <DropdownMenuItem asChild className="hover:bg-accent hover:text-accent-foreground transition-colors duration-150 cursor-pointer rounded-md px-2 py-1.5">
                   <Link to="/archived-habits" className="flex items-center">
                     <Archive className="mr-2 h-4 w-4" /> View Archived Habits
@@ -141,39 +151,82 @@ const Index = () => {
               </DropdownMenuContent>
             </DropdownMenu>
             <ThemeToggle />
+            <Link to="/create-habit">
+              <Button variant="ghost" size="icon" className="text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors duration-200 rounded-lg">
+                <Plus className="h-5 w-5" />
+              </Button>
+            </Link>
           </div>
-
-          <h1 className="text-3xl md:text-4xl font-extrabold text-foreground tracking-tight">HabitKit</h1>
-          <Link to="/create-habit">
-            <Button variant="ghost" size="icon" className="text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors duration-200 rounded-lg">
-              <Plus className="h-5 w-5" />
-            </Button>
-          </Link>
         </header>
 
-        <div className="space-y-4 mb-8 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-4 md:space-y-0">
-          {habits.length === 0 ? (
-            <div className="md:col-span-2 lg:col-span-3 text-center text-muted-foreground mt-12 p-8 bg-card border border-border rounded-xl shadow-lg flex flex-col items-center justify-center">
-              <Sparkles className="h-12 w-12 text-primary mb-4" />
-              <p className="text-xl font-semibold mb-4">No habits yet. Let's build some good routines!</p>
-              <Link to="/create-habit">
-                <Button className="bg-primary hover:bg-primary/90 text-primary-foreground transition-colors duration-200 rounded-lg px-6 py-3 text-base">
-                  <Plus className="mr-2 h-4 w-4" /> Create Your First Habit
-                </Button>
-              </Link>
+        {habits.length === 0 ? (
+          <div className="text-center text-muted-foreground mt-12 p-8 bg-card border border-border rounded-xl shadow-lg flex flex-col items-center justify-center">
+            <Sparkles className="h-12 w-12 text-primary mb-4" />
+            <p className="text-xl font-semibold mb-4">No habits yet. Let's build some good routines!</p>
+            <Link to="/create-habit">
+              <Button className="bg-primary hover:bg-primary/90 text-primary-foreground transition-colors duration-200 rounded-lg px-6 py-3 text-base">
+                <Plus className="mr-2 h-4 w-4" /> Create Your First Habit
+              </Button>
+            </Link>
+          </div>
+        ) : (
+          <>
+            {/* Overall Daily Progress Circle */}
+            <div className="flex justify-center mb-8">
+              <div className="relative h-32 w-32 flex items-center justify-center">
+                <Progress
+                  value={overallDailyProgress}
+                  className="absolute h-full w-full rounded-full"
+                  indicatorClassName="rounded-full"
+                  style={{
+                    '--progress-background': 'hsl(var(--muted))',
+                    '--progress-indicator-color': 'linear-gradient(to right, #8338EC, #3A86FF)', // Gradient for the progress circle
+                  } as React.CSSProperties}
+                />
+                <span className="relative z-10 text-3xl font-bold text-foreground">
+                  {overallDailyProgress}%
+                </span>
+              </div>
             </div>
-          ) : (
-            habits.map((habit) => (
-              <HabitCard
-                key={habit.id}
-                habit={habit}
-                onHabitUpdate={handleHabitUpdate}
-                onArchiveHabit={handleArchiveHabit}
-                onDeleteHabit={handleDeleteHabit}
-              />
-            ))
-          )}
-        </div>
+
+            {/* Today's Habits */}
+            <div className="space-y-3 mb-8">
+              {todayHabits.map((habit) => (
+                <HabitListItem
+                  key={habit.id}
+                  habit={habit}
+                  onHabitUpdate={handleHabitUpdate}
+                  onArchiveHabit={handleArchiveHabit}
+                  onDeleteHabit={handleDeleteHabit}
+                  onToggleCompletion={toggleHabitCompletion}
+                  onIncrementCompletion={incrementHabitCompletion}
+                  onDecrementCompletion={decrementHabtCompletion}
+                />
+              ))}
+            </div>
+
+            {/* Weekly/Monthly Goals */}
+            {weeklyMonthlyHabits.length > 0 && (
+              <>
+                <h2 className="text-2xl font-extrabold text-foreground tracking-tight mb-6 mt-10">Weekly Goals</h2>
+                <div className="space-y-3 mb-8">
+                  {weeklyMonthlyHabits.map((habit) => (
+                    <HabitListItem
+                      key={habit.id}
+                      habit={habit}
+                      onHabitUpdate={handleHabitUpdate}
+                      onArchiveHabit={handleArchiveHabit}
+                      onDeleteHabit={handleDeleteHabit}
+                      onToggleCompletion={toggleHabitCompletion}
+                      onIncrementCompletion={incrementHabitCompletion}
+                      onDecrementCompletion={decrementHabitCompletion}
+                    />
+                  ))}
+                </div>
+              </>
+            )}
+          </>
+        )}
 
         <MadeWithDyad />
       </div>

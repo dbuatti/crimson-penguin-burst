@@ -1,4 +1,4 @@
-import { getHabits, addHabit, updateHabit, getHabitById } from './habit-storage'; // Use Supabase functions for data operations
+import { getHabits, addHabit, updateHabit, getHabitById } from './habit-storage';
 import { Habit } from '@/types/habit';
 import { showSuccess, showError } from '@/utils/toast';
 import { Session } from '@supabase/supabase-js';
@@ -8,8 +8,10 @@ export const exportHabits = async (session: Session | null): Promise<void> => {
     showError('You must be logged in to export habits.');
     return;
   }
-  const habits = await getHabits(session); // Fetch from Supabase for export
-  const dataStr = JSON.stringify(habits, null, 2);
+  const habits = await getHabits(session);
+  // Filter out the transient UI-specific fields before export
+  const habitsToExport = habits.map(({ currentCompletionCount, isCompletedToday, ...rest }) => rest);
+  const dataStr = JSON.stringify(habitsToExport, null, 2);
   const blob = new Blob([dataStr], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -36,7 +38,6 @@ export const importHabits = async (file: File, session: Session | null): Promise
         if (typeof result === 'string') {
           const importedData: Habit[] = JSON.parse(result);
 
-          // Basic validation to ensure it looks like habit data
           if (!Array.isArray(importedData) || !importedData.every(item => 'id' in item && 'name' in item && 'color' in item)) {
             throw new Error('Invalid habit data format.');
           }
@@ -45,14 +46,11 @@ export const importHabits = async (file: File, session: Session | null): Promise
           let failCount = 0;
 
           for (const importedHabit of importedData) {
-            // Check if a habit with the same ID already exists for the user
             const existingHabit = await getHabitById(importedHabit.id, session);
             if (existingHabit) {
-              // Update existing habit
               const updated = await updateHabit({ ...importedHabit, user_id: session.user.id }, session);
               if (updated) successCount++; else failCount++;
             } else {
-              // Add new habit
               const added = await addHabit({
                 name: importedHabit.name,
                 description: importedHabit.description || '',
