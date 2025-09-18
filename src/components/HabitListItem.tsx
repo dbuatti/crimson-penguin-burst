@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { MoreVertical, Edit, CalendarDays, Archive, Share2, Trash2 } from 'lucide-react';
 import CircularProgress from './CircularProgress'; // Import the new CircularProgress component
+import { format } from 'date-fns'; // Import format from date-fns
 
 interface HabitListItemProps {
   habit: Habit;
@@ -33,7 +34,7 @@ const HabitListItem: React.FC<HabitListItemProps> = ({
   onIncrementCompletion,
   onDecrementCompletion,
 }) => {
-  const today = new Date().toISOString().split('T')[0];
+  const today = format(new Date(), 'yyyy-MM-dd'); // Use date-fns for consistent 'today'
 
   const IconComponent = React.useMemo(() => {
     const RequestedIcon = (LucideIcons as any)[habit.icon];
