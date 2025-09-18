@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { cn } from '@/lib/utils';
-import { format, startOfWeek, addDays, subWeeks, isSameMonth } from 'date-fns';
+import { format, startOfWeek, addDays, subWeeks } from 'date-fns';
 
 interface CompactHabitGridProps {
   completionDates: string[];
@@ -8,20 +8,50 @@ interface CompactHabitGridProps {
 }
 
 const WEEK_DAYS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
-const NUM_WEEKS_TO_SHOW = 8;
+
+// Function to determine the number of weeks based on screen width
+const calculateWeeksToShow = (width: number): number => {
+  if (width < 640) { // Small screens (e.g., mobile portrait)
+    return 4;
+  } else if (width < 768) { // Medium screens (e.g., mobile landscape, small tablets)
+    return 6;
+  } else if (width < 1024) { // Large screens (e.g., tablets, small laptops)
+    return 8;
+  } else if (width < 1280) { // Larger screens
+    return 10;
+  } else { // Extra large screens
+    return 12;
+  }
+};
 
 const CompactHabitGrid: React.FC<CompactHabitGridProps> = ({
   completionDates,
   habitColor,
 }) => {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  const [numWeeksToShow, setNumWeeksToShow] = useState(calculateWeeksToShow(window.innerWidth));
 
-  const startOfCurrentWeek = startOfWeek(today, { weekStartsOn: 1 });
-  const gridStartDate = subWeeks(startOfCurrentWeek, NUM_WEEKS_TO_SHOW - 1);
+  const handleResize = useCallback(() => {
+    setNumWeeksToShow(calculateWeeksToShow(window.innerWidth));
+  }, []);
+
+  useEffect(() => {
+    // Set initial value on mount
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [handleResize]);
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0); // Normalize today to start of day
+
+  const startOfCurrentWeek = startOfWeek(today, { weekStartsOn: 1 }); // Monday of the current week
+  // Calculate grid start date based on dynamic numWeeksToShow
+  const gridStartDate = subWeeks(startOfCurrentWeek, numWeeksToShow - 1);
 
   const dates: Date[] = [];
-  for (let i = 0; i < NUM_WEEKS_TO_SHOW * 7; i++) {
+  for (let i = 0; i < numWeeksToShow * 7; i++) {
     dates.push(addDays(gridStartDate, i));
   }
 
