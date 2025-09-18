@@ -28,7 +28,6 @@ const CompactHabitCard: React.FC<CompactHabitCardProps> = ({ habit, completionDa
     const sortedDates = [...dates].sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
     
     let longestStreak = 0;
-    let currentStreak = 0;
     let tempCurrentStreak = 0;
 
     const today = new Date();
@@ -137,16 +136,13 @@ const CompactHabitCard: React.FC<CompactHabitCardProps> = ({ habit, completionDa
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center space-x-4">
             <div className="text-xs text-muted-foreground">
-              <span className="font-medium text-foreground">Streaks:</span>
+              <span className="font-medium text-foreground">Current:</span> {currentStreak} <span className="text-muted-foreground">(current streak)</span>
             </div>
             <div className="text-xs text-muted-foreground">
-              <span className="font-medium text-foreground">Longest:</span> {longestStreak}
+              <span className="font-medium text-foreground">Longest:</span> {longestStreak} <span className="text-muted-foreground">(longest held streak)</span>
             </div>
             <div className="text-xs text-muted-foreground">
-              <span className="font-medium text-foreground">Current:</span> {currentStreak}
-            </div>
-            <div className="text-xs text-muted-foreground">
-              <span className="font-medium text-foreground">Completed:</span> {totalCompletions}
+              <span className="font-medium text-foreground">Completed:</span> {totalCompletions} <span className="text-muted-foreground">(tally)</span>
             </div>
           </div>
         </div>
