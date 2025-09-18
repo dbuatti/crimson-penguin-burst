@@ -26,8 +26,8 @@ const Settings: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground p-6 flex flex-col items-center">
-      <div className="w-full max-w-4xl space-y-3 p-4 bg-card border border-border rounded-xl shadow-lg mt-4"> {/* Changed max-w-2xl to max-w-4xl */}
+    <div className="min-h-screen bg-background text-foreground p-6 flex flex-col items-center w-full max-w-4xl"> {/* Added max-w-4xl here */}
+      <div className="w-full space-y-3 p-4 bg-card border border-border rounded-xl shadow-lg mt-4">
         
         <div className="flex items-center justify-between py-2">
           <span className="text-foreground">Theme</span>

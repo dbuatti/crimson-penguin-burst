@@ -211,8 +211,8 @@ const History: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground p-6 flex flex-col items-center">
-      <div className="flex items-center justify-center p-1 bg-secondary rounded-full shadow-inner border border-border mb-6 max-w-4xl w-full"> {/* Changed max-w-2xl to max-w-4xl */}
+    <div className="min-h-screen bg-background text-foreground p-6 flex flex-col items-center w-full max-w-4xl"> {/* Added max-w-4xl here */}
+      <div className="flex items-center justify-center p-1 bg-secondary rounded-full shadow-inner border border-border mb-6 w-full">
         {tabs.map((tab) => {
           const IconComponent = tab.icon;
           return (
@@ -234,7 +234,7 @@ const History: React.FC = () => {
       </div>
 
       {activeTab === 'habits' && (
-        <div className="w-full max-w-4xl space-y-3"> {/* Changed max-w-2xl to max-w-4xl */}
+        <div className="w-full space-y-3">
           {habitsHistory.length === 0 ? (
             <div className="text-center text-muted-foreground p-8 bg-card border border-border rounded-xl shadow-lg flex flex-col items-center justify-center">
               <Sparkles className="h-12 w-12 text-primary mb-4" />
@@ -254,7 +254,7 @@ const History: React.FC = () => {
       )}
 
       {activeTab === 'statistics' && (
-        <div className="w-full max-w-4xl space-y-6"> {/* Changed max-w-2xl to max-w-4xl */}
+        <div className="w-full space-y-6">
           <OverallStatsCards
             totalCompletions={totalCompletions}
             longestStreakEver={longestStreakEver}
@@ -300,7 +300,7 @@ const History: React.FC = () => {
       )}
 
       {activeTab === 'archived' && (
-        <div className="w-full max-w-4xl space-y-6"> {/* Changed max-w-2xl to max-w-4xl */}
+        <div className="w-full space-y-6">
           <div className="bg-card border border-border rounded-xl shadow-lg p-6">
             <h2 className="text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
               <Archive className="h-5 w-5" />
