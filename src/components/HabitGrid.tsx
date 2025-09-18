@@ -7,7 +7,6 @@ interface HabitGridProps {
   habitColor: string;
 }
 
-const WEEK_DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 const NUM_WEEKS_TO_SHOW = 7; // Display the last 7 weeks
 
 const HabitGrid: React.FC<HabitGridProps> = ({
@@ -28,7 +27,6 @@ const HabitGrid: React.FC<HabitGridProps> = ({
 
   return (
     <div className="p-3 rounded-md bg-secondary border border-border overflow-hidden">
-      {/* Day labels are removed */}
       <div className="grid grid-cols-7 gap-1">
         {dates.map((date, index) => {
           const dateFormatted = format(date, 'yyyy-MM-dd');
@@ -37,24 +35,34 @@ const HabitGrid: React.FC<HabitGridProps> = ({
           const isFuture = date > today;
           const isCurrentDay = isSameDay(date, today);
           const dayOfMonth = format(date, 'd');
+          const isFirstDayOfMonth = date.getDate() === 1;
 
           return (
             <div
               key={index}
-              className={cn(
-                "w-5 h-5 rounded-sm flex items-center justify-center transition-all duration-200 relative",
-                {
-                  "bg-accent": !isCompleted && !isPast, // Default for incomplete future/current days
-                  "bg-muted": isPast && !isCompleted, // Distinct background for past incomplete days
-                  "border border-primary/50": isCurrentDay && !isCompleted, // Highlight today with a subtle border if incomplete
-                  "opacity-50": isFuture, // Dim future dates
-                }
-              )}
-              style={{ backgroundColor: isCompleted ? habitColor : undefined }}
+              className="flex flex-col items-center justify-start" // Container for month label and day square
             >
-              <span className="text-[8px] font-bold text-foreground opacity-20">
-                {dayOfMonth}
-              </span>
+              {isFirstDayOfMonth && (
+                <div className="text-[8px] font-bold uppercase text-muted-foreground mb-1">
+                  {format(date, 'MMM')}
+                </div>
+              )}
+              <div
+                className={cn(
+                  "w-5 h-5 rounded-sm flex items-center justify-center transition-all duration-200 relative",
+                  {
+                    "bg-accent": !isCompleted && !isPast, // Default for incomplete future/current days
+                    "bg-muted": isPast && !isCompleted, // Distinct background for past incomplete days
+                    "border border-primary/50": isCurrentDay && !isCompleted, // Highlight today with a subtle border if incomplete
+                    "opacity-50": isFuture, // Dim future dates
+                  }
+                )}
+                style={{ backgroundColor: isCompleted ? habitColor : undefined }}
+              >
+                <span className="text-[8px] font-bold text-foreground opacity-20">
+                  {dayOfMonth}
+                </span>
+              </div>
             </div>
           );
         })}
