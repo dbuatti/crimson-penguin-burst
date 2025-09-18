@@ -31,7 +31,7 @@ const Login: React.FC = () => {
             },
           }}
           theme="dark" // Using dark theme for Auth UI to match app's dark mode
-          redirectTo={window.location.origin + '/'} // Redirect to home after successful login
+          redirectTo="/" // Changed to a relative path
         />
       </div>
     </div>
