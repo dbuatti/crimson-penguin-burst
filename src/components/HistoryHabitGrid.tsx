@@ -1,14 +1,13 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { format, startOfWeek, addDays, subWeeks, isSameMonth, isToday } from 'date-fns';
+import { format, startOfWeek, addDays, subWeeks, isToday } from 'date-fns';
 
 interface HistoryHabitGridProps {
   completionDates: string[]; // Array of 'yyyy-MM-dd' strings
   habitColor: string;
 }
 
-const WEEK_DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-const NUM_WEEKS_TO_SHOW = 16; // Display the last 16 weeks for history
+const NUM_WEEKS_TO_SHOW = 52; // Display the last 52 weeks (approx. one year)
 
 const HistoryHabitGrid: React.FC<HistoryHabitGridProps> = ({
   completionDates,
@@ -17,6 +16,7 @@ const HistoryHabitGrid: React.FC<HistoryHabitGridProps> = ({
   const today = new Date();
   today.setHours(0, 0, 0, 0); // Normalize today to start of day
 
+  // Start the grid from the Monday of the week 51 weeks ago
   const startOfCurrentWeek = startOfWeek(today, { weekStartsOn: 1 }); // Monday of the current week
   const gridStartDate = subWeeks(startOfCurrentWeek, NUM_WEEKS_TO_SHOW - 1);
 
@@ -25,60 +25,29 @@ const HistoryHabitGrid: React.FC<HistoryHabitGridProps> = ({
     dates.push(addDays(gridStartDate, i));
   }
 
-  let lastRenderedMonth: string | null = null;
-
   return (
-    <div className="p-4 rounded-xl bg-secondary border border-border overflow-hidden">
-      {/* Day labels */}
-      <div className="grid grid-cols-7 gap-1 mb-2">
-        {WEEK_DAYS.map((day) => (
-          <div key={day} className="flex items-center justify-center text-xs font-medium text-muted-foreground w-7 h-7">
-            {day}
-          </div>
-        ))}
-      </div>
-
-      {/* Habit completion grid */}
-      <div className="grid grid-cols-7 gap-1">
+    <div className="p-2 rounded-xl bg-secondary border border-border overflow-hidden">
+      {/* Habit completion grid - 7 columns for days of the week */}
+      <div className="grid grid-cols-7 gap-0.5">
         {dates.map((date, index) => {
           const dateFormatted = format(date, 'yyyy-MM-dd');
           const isCompleted = completionDates.includes(dateFormatted);
           const isFuture = date > today;
-          const dayOfMonth = format(date, 'd');
-          const currentMonthAbbr = format(date, 'MMM').toUpperCase();
-
-          const showMonthDelineator = (index === 0 || !isSameMonth(date, addDays(date, -1))) && currentMonthAbbr !== lastRenderedMonth;
-          if (showMonthDelineator) {
-            lastRenderedMonth = currentMonthAbbr;
-          }
 
           return (
-            <React.Fragment key={index}>
-              {showMonthDelineator && (
-                <div className="col-span-7 text-left text-xs font-bold text-foreground mt-3 mb-1 pl-1">
-                  {currentMonthAbbr}
-                </div>
+            <div
+              key={index}
+              className={cn(
+                "w-2.5 h-2.5 rounded-full", // Small dot size
+                {
+                  "bg-muted": !isCompleted && !isFuture, // Muted for uncompleted past/present
+                  "opacity-30 cursor-not-allowed": isFuture, // Faded for future dates
+                  "bg-green-500": isCompleted, // Default green for completed, will be overridden by habitColor
+                }
               )}
-              <div
-                className="relative w-7 h-7"
-              >
-                <div
-                  className={cn(
-                    "w-full h-full rounded-md flex items-center justify-center text-[10px] font-semibold",
-                    {
-                      "bg-muted text-muted-foreground": !isCompleted && !isFuture,
-                      "opacity-50": isFuture,
-                      "text-white": isCompleted,
-                      "border border-primary/50": isToday(date) && !isCompleted, // Highlight today if not completed
-                    }
-                  )}
-                  style={{ backgroundColor: isCompleted ? habitColor : undefined }}
-                  aria-label={`${isCompleted ? 'Completed' : 'Not completed'} ${format(date, 'EEEE, MMMM d, yyyy')}`}
-                >
-                  {dayOfMonth}
-                </div>
-              </div>
-            </React.Fragment>
+              style={{ backgroundColor: isCompleted ? habitColor : undefined }}
+              title={`${format(date, 'EEEE, MMMM d, yyyy')} - ${isCompleted ? 'Completed' : 'Not completed'}`}
+            />
           );
         })}
       </div>
