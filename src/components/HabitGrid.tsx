@@ -40,16 +40,16 @@ const HabitGrid: React.FC<HabitGridProps> = ({
           return (
             <div
               key={index}
-              className="flex flex-col items-center justify-start" // Container for month label and day square
+              className="relative w-5 h-5" // Fixed size for the grid cell
             >
               {isFirstDayOfMonth && (
-                <div className="text-[8px] font-bold uppercase text-muted-foreground mb-1">
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 text-[8px] font-bold uppercase text-muted-foreground whitespace-nowrap">
                   {format(date, 'MMM')}
                 </div>
               )}
               <div
                 className={cn(
-                  "w-5 h-5 rounded-sm flex items-center justify-center transition-all duration-200 relative",
+                  "w-full h-full rounded-sm flex items-center justify-center transition-all duration-200", // Fill the parent div
                   {
                     "bg-accent": !isCompleted && !isPast, // Default for incomplete future/current days
                     "bg-muted": isPast && !isCompleted, // Distinct background for past incomplete days
