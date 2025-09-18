@@ -1,7 +1,7 @@
 import React from 'react';
 import { Habit } from '@/types/habit';
 import { Card, CardContent } from '@/components/ui/card';
-import * as LucideIcons from 'lucide-react'; // Corrected import statement
+import * as LucideIcons from 'lucide-react';
 import { Circle } from 'lucide-react';
 import CompactHabitGrid from './CompactHabitGrid';
 
@@ -25,14 +25,28 @@ const CompactHabitCard: React.FC<CompactHabitCardProps> = ({ habit, completionDa
     
     // Sort dates chronologically to correctly identify streaks
     const sortedDates = [...dates].sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
-    let longestStreak = 1;
-    let currentStreak = 1;
+    
+    let longestStreak = 0; // Initialize to 0, a single completion is a streak of 1
+    let currentStreak = 0;
+
+    if (sortedDates.length > 0) {
+      longestStreak = 1; // At least one completion means a streak of 1
+      currentStreak = 1;
+    }
     
     for (let i = 1; i < sortedDates.length; i++) {
       const currentDate = new Date(sortedDates[i]);
       const prevDate = new Date(sortedDates[i - 1]);
+
+      // Validate dates to prevent NaN issues
+      if (isNaN(currentDate.getTime()) || isNaN(prevDate.getTime())) {
+        console.warn(`Invalid date found in completionDates for habit ${habit.name}: ${sortedDates[i-1]}, ${sortedDates[i]}`);
+        currentStreak = 0; // Reset streak if invalid date encountered
+        continue;
+      }
+
       const diffTime = currentDate.getTime() - prevDate.getTime();
-      const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24)); // Round to handle potential floating point issues
+      const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
 
       if (diffDays === 1) { // Check for exactly one day difference for a consecutive streak
         currentStreak++;
@@ -50,9 +64,11 @@ const CompactHabitCard: React.FC<CompactHabitCardProps> = ({ habit, completionDa
   const totalCompletions = completionDates.length;
 
   // Debugging logs
-  console.log(`Habit: ${habit.name}`);
-  console.log(`  Completion Dates:`, completionDates);
+  console.log(`--- Habit: ${habit.name} ---`);
+  console.log(`  Raw Completion Dates:`, completionDates);
   console.log(`  Calculated Longest Streak:`, longestStreak);
+  console.log(`  Total Completions:`, totalCompletions);
+  console.log(`--------------------------`);
 
   return (
     <Card className="w-full bg-card text-foreground border border-border rounded-xl shadow-sm">
@@ -69,9 +85,7 @@ const CompactHabitCard: React.FC<CompactHabitCardProps> = ({ habit, completionDa
               )}
             </div>
           </div>
-          <div className="text-xs text-muted-foreground">
-            {completionDates.length} completions
-          </div>
+          {/* Removed the redundant "completions" text here as it's covered by "Completed" below */}
         </div>
         
         {/* Streaks display */}
