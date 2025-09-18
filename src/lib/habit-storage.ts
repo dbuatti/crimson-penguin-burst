@@ -1,4 +1,4 @@
-import { Habit, HabitId } from "@/types/habit";
+import { Habit, HabitId, HabitFormData } from "@/types/habit";
 import { supabase } from '@/integrations/supabase/client';
 import { Session } from '@supabase/supabase-js';
 
@@ -6,6 +6,23 @@ import { Session } from '@supabase/supabase-js';
 const getUserId = (session: Session | null): string | null => {
   return session?.user?.id || null;
 };
+
+// Helper to map Supabase snake_case data to Habit camelCase interface
+const mapSupabaseHabitToAppHabit = (data: any): Habit => ({
+  id: data.id,
+  user_id: data.user_id,
+  name: data.name,
+  description: data.description,
+  icon: data.icon,
+  color: data.color,
+  goalType: data.goal_type,
+  goalValue: data.goal_value,
+  reminders: data.reminders,
+  completionDates: data.completion_dates,
+  createdAt: data.created_at,
+  updatedAt: data.updated_at,
+  archived: data.archived,
+});
 
 export const getHabits = async (session: Session | null): Promise<Habit[]> => {
   const userId = getUserId(session);
@@ -22,28 +39,32 @@ export const getHabits = async (session: Session | null): Promise<Habit[]> => {
       console.error("Failed to load habits from Supabase:", error);
       return [];
     }
-    return data as Habit[];
+    return (data || []).map(mapSupabaseHabitToAppHabit);
   } catch (error) {
     console.error("Failed to load habits from Supabase:", error);
     return [];
   }
 };
 
-export const addHabit = async (newHabit: Omit<Habit, 'id' | 'createdAt' | 'updatedAt' | 'completionDates' | 'archived'>, session: Session | null): Promise<Habit | null> => {
+export const addHabit = async (newHabitData: HabitFormData, session: Session | null): Promise<Habit | null> => {
   const userId = getUserId(session);
   if (!userId) return null;
 
   try {
-    const habitToInsert = {
-      ...newHabit,
-      user_id: userId,
-      completion_dates: [], // Ensure completion_dates is an array
-      archived: false,
-    };
-
     const { data, error } = await supabase
       .from('habits')
-      .insert(habitToInsert)
+      .insert({
+        user_id: userId,
+        name: newHabitData.name,
+        description: newHabitData.description,
+        icon: newHabitData.icon,
+        color: newHabitData.color,
+        goal_type: newHabitData.goalType,
+        goal_value: newHabitData.goalValue,
+        reminders: newHabitData.reminders,
+        completion_dates: [],
+        archived: false,
+      })
       .select()
       .single();
 
@@ -51,7 +72,7 @@ export const addHabit = async (newHabit: Omit<Habit, 'id' | 'createdAt' | 'updat
       console.error("Failed to add habit to Supabase:", error);
       return null;
     }
-    return data as Habit;
+    return mapSupabaseHabitToAppHabit(data);
   } catch (error) {
     console.error("Failed to add habit to Supabase:", error);
     return null;
@@ -85,7 +106,7 @@ export const updateHabit = async (updatedHabit: Habit, session: Session | null):
       console.error("Failed to update habit in Supabase:", error);
       return null;
     }
-    return data as Habit;
+    return mapSupabaseHabitToAppHabit(data);
   } catch (error) {
     console.error("Failed to update habit in Supabase:", error);
     return null;
@@ -130,7 +151,7 @@ export const getHabitById = async (id: HabitId, session: Session | null): Promis
       console.error("Failed to get habit by ID from Supabase:", error);
       return undefined;
     }
-    return data as Habit;
+    return data ? mapSupabaseHabitToAppHabit(data) : undefined;
   } catch (error) {
     console.error("Failed to get habit by ID from Supabase:", error);
     return undefined;
