@@ -1,11 +1,11 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { format, startOfWeek, addDays, subWeeks, isSameDay } from 'date-fns';
+import { format, startOfWeek, addDays, subWeeks, isSameDay, isSameMonth } from 'date-fns';
 
 interface HabitGridProps {
   completionDates: string[];
   habitColor: string;
-  onToggleCompletion: (dateString: string) => void; // Re-introducing this prop
+  onToggleCompletion: (dateString: string) => void;
 }
 
 const WEEK_DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -28,6 +28,8 @@ const HabitGrid: React.FC<HabitGridProps> = ({
     dates.push(addDays(gridStartDate, i));
   }
 
+  let currentMonth: string | null = null;
+
   return (
     <div className="p-3 rounded-md bg-secondary border border-border overflow-hidden">
       {/* Day labels */}
@@ -48,32 +50,44 @@ const HabitGrid: React.FC<HabitGridProps> = ({
           const isFuture = date > today;
           const isCurrentDay = isSameDay(date, today);
           const dayOfMonth = format(date, 'd');
+          const monthAbbr = format(date, 'MMM').toUpperCase();
+
+          const showMonthDelineator = currentMonth !== monthAbbr;
+          if (showMonthDelineator) {
+            currentMonth = monthAbbr;
+          }
 
           return (
-            <div
-              key={index}
-              className="relative w-6 h-6" // Slightly larger cells for better touch target and readability
-            >
-              <button
-                type="button"
-                onClick={() => onToggleCompletion(dateFormatted)}
-                className={cn(
-                  "w-full h-full rounded-sm flex items-center justify-center text-[10px] font-semibold transition-all duration-200",
-                  "focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary",
-                  {
-                    "bg-muted text-muted-foreground hover:brightness-110": isPast && !isCompleted, // Past incomplete
-                    "bg-accent text-accent-foreground hover:brightness-110": !isPast && !isFuture && !isCompleted, // Current incomplete (not today)
-                    "bg-accent text-accent-foreground border border-primary/50 hover:brightness-110": isCurrentDay && !isCompleted, // Today incomplete
-                    "opacity-50 cursor-not-allowed": isFuture, // Dim future dates and disable clicks
-                    "text-white": isCompleted, // Text color for completed days
-                  }
-                )}
-                style={{ backgroundColor: isCompleted ? habitColor : undefined }}
-                disabled={isFuture} // Disable clicking on future dates
+            <React.Fragment key={index}>
+              {showMonthDelineator && (
+                <div className="col-span-7 text-left text-xs font-bold text-foreground mt-2 mb-1 pl-1">
+                  {monthAbbr}
+                </div>
+              )}
+              <div
+                className="relative w-6 h-6"
               >
-                {dayOfMonth}
-              </button>
-            </div>
+                <button
+                  type="button"
+                  onClick={() => onToggleCompletion(dateFormatted)}
+                  className={cn(
+                    "w-full h-full rounded-sm flex items-center justify-center text-[10px] font-semibold transition-all duration-200",
+                    "focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary",
+                    {
+                      "bg-muted text-muted-foreground hover:brightness-110": isPast && !isCompleted,
+                      "bg-accent text-accent-foreground hover:brightness-110": !isPast && !isFuture && !isCompleted,
+                      "bg-accent text-accent-foreground border border-primary/50 hover:brightness-110": isCurrentDay && !isCompleted,
+                      "opacity-50 cursor-not-allowed": isFuture,
+                      "text-white": isCompleted,
+                    }
+                  )}
+                  style={{ backgroundColor: isCompleted ? habitColor : undefined }}
+                  disabled={isFuture}
+                >
+                  {dayOfMonth}
+                </button>
+              </div>
+            </React.Fragment>
           );
         })}
       </div>
