@@ -3,7 +3,7 @@ import { getHabits, getHabitCompletionLogs, getAllHabitLogs, getDailyHabitComple
 import { Habit } from '@/types/habit';
 import { useSession } from '@/components/SessionContextProvider';
 import CompactHabitCard from '@/components/CompactHabitCard';
-import { Sparkles, BarChart3, Archive, Calendar, ListTodo } from 'lucide-react';
+import { Sparkles, BarChart3, Archive, Calendar, ListTodo } from 'lucide-react'; // Added ListTodo icon
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { cn, calculateOverallStreaks } from '@/lib/utils';
@@ -21,7 +21,7 @@ interface ChartDataPoint {
   value: number;
 }
 
-const tabs = [
+const tabs: { id: 'habits' | 'statistics' | 'archived'; label: string; icon: React.ElementType; }[] = [
   { id: 'habits', label: 'Habits', icon: ListTodo },
   { id: 'statistics', label: 'Statistics', icon: BarChart3 },
   { id: 'archived', label: 'Archived', icon: Archive },
@@ -86,8 +86,6 @@ const History: React.FC = () => {
     if (!session) return;
 
     let daysToFetch = 30; // Default for 31D
-    let currentEndDate = startOfDay(new Date());
-
     if (dailyTimeRange === '7D') {
       daysToFetch = 7;
     } else if (dailyTimeRange === '31D') {
@@ -98,10 +96,10 @@ const History: React.FC = () => {
       daysToFetch = 365;
     }
 
-    // Adjust the end date based on the offset
-    const adjustedEndDate = subDays(currentEndDate, daysToFetch * dailyDateOffset);
+    // Calculate the end date for the current view based on the offset
+    const currentViewEndDate = subDays(startOfDay(new Date()), daysToFetch * dailyDateOffset);
 
-    const data = await getDailyHabitCompletionSummary(session, daysToFetch, adjustedEndDate);
+    const data = await getDailyHabitCompletionSummary(session, daysToFetch, currentViewEndDate);
     setDailyChartData(data.map(d => ({ date: d.completion_date, value: d.completion_percentage })));
     const avg = data.length > 0 ? data.reduce((sum, d) => sum + d.completion_percentage, 0) / data.length : 0;
     setDailyAvgPercentage(Math.round(avg));
@@ -111,8 +109,6 @@ const History: React.FC = () => {
     if (!session) return;
 
     let weeksToFetch = 16; // Default for 16W
-    let currentEndDate = startOfWeek(new Date(), { weekStartsOn: 1 });
-
     if (weeklyTimeRange === '5W') {
       weeksToFetch = 5;
     } else if (weeklyTimeRange === '16W') {
@@ -123,10 +119,10 @@ const History: React.FC = () => {
       weeksToFetch = 52;
     }
 
-    // Adjust the end date based on the offset
-    const adjustedEndDate = subWeeks(currentEndDate, weeksToFetch * weeklyDateOffset);
+    // Calculate the end date for the current view based on the offset
+    const currentViewEndDate = subWeeks(startOfWeek(new Date(), { weekStartsOn: 1 }), weeksToFetch * weeklyDateOffset);
 
-    const data = await getWeeklyHabitCompletionSummary(session, weeksToFetch, adjustedEndDate);
+    const data = await getWeeklyHabitCompletionSummary(session, weeksToFetch, currentViewEndDate);
     setWeeklyChartData(data.map(d => ({ date: d.week_start_date, value: d.completion_percentage })));
     const avg = data.length > 0 ? data.reduce((sum, d) => sum + d.completion_percentage, 0) / data.length : 0;
     setWeeklyAvgPercentage(Math.round(avg));

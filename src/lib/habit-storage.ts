@@ -144,13 +144,13 @@ export const getHabitCompletionLogs = async (habitId: HabitId, session: Session 
   }
 };
 
-export const getDailyHabitCompletionSummary = async (session: Session | null, days: number = 30): Promise<{ completion_date: string; completion_percentage: number }[]> => {
+export const getDailyHabitCompletionSummary = async (session: Session | null, days: number = 30, endDate: Date = new Date()): Promise<{ completion_date: string; completion_percentage: number }[]> => {
   const userId = getUserId(session);
   if (!userId) return [];
 
   try {
     const { data, error } = await supabase
-      .rpc('get_daily_habit_completion_summary', { p_user_id: userId, p_days: days });
+      .rpc('get_daily_habit_completion_summary', { p_user_id: userId, p_days: days, p_end_date: format(endDate, 'yyyy-MM-dd') });
 
     if (error) {
       console.error("Failed to fetch daily habit completion summary:", error);
@@ -163,13 +163,13 @@ export const getDailyHabitCompletionSummary = async (session: Session | null, da
   }
 };
 
-export const getWeeklyHabitCompletionSummary = async (session: Session | null, weeks: number = 16): Promise<{ week_start_date: string; completion_percentage: number }[]> => {
+export const getWeeklyHabitCompletionSummary = async (session: Session | null, weeks: number = 16, endDate: Date = new Date()): Promise<{ week_start_date: string; completion_percentage: number }[]> => {
   const userId = getUserId(session);
   if (!userId) return [];
 
   try {
     const { data, error } = await supabase
-      .rpc('get_weekly_habit_completion_summary', { p_user_id: userId, p_weeks: weeks });
+      .rpc('get_weekly_habit_completion_summary', { p_user_id: userId, p_weeks: weeks, p_end_date: format(endDate, 'yyyy-MM-dd') });
 
     if (error) {
       console.error("Failed to fetch weekly habit completion summary:", error);
