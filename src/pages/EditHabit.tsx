@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getHabitById, updateHabit } from '@/lib/habit-storage';
 import { HabitFormData, Habit } from '@/types/habit';
@@ -6,6 +6,7 @@ import HabitForm from '@/components/HabitForm';
 import { toast } from 'sonner';
 import { X, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useSession } from '@/components/SessionContextProvider';
 
 const EditHabit: React.FC = () => {
   const navigate = useNavigate();
@@ -14,10 +15,11 @@ const EditHabit: React.FC = () => {
   const [habit, setHabit] = useState<Habit | undefined>(undefined);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const { session, loading: sessionLoading } = useSession();
 
-  useEffect(() => {
-    if (id) {
-      const fetchedHabit = getHabitById(id);
+  const fetchHabit = useCallback(async () => {
+    if (id && session) {
+      const fetchedHabit = await getHabitById(id, session);
       if (fetchedHabit) {
         setHabit(fetchedHabit);
         setInitialData({
@@ -37,9 +39,15 @@ const EditHabit: React.FC = () => {
       }
     }
     setIsLoading(false);
-  }, [id, navigate]);
+  }, [id, navigate, session]);
 
-  const handleSubmit = (data: HabitFormData) => {
+  useEffect(() => {
+    if (!sessionLoading) {
+      fetchHabit();
+    }
+  }, [fetchHabit, sessionLoading]);
+
+  const handleSubmit = async (data: HabitFormData) => {
     if (!habit) return;
 
     setIsSubmitting(true);
@@ -48,11 +56,17 @@ const EditHabit: React.FC = () => {
         ...habit,
         ...data,
       };
-      updateHabit(updatedHabit);
-      toast.success('Habit updated successfully!', {
-        icon: <Check className="h-4 w-4" />,
-      });
-      navigate('/');
+      const result = await updateHabit(updatedHabit, session);
+      if (result) {
+        toast.success('Habit updated successfully!', {
+          icon: <Check className="h-4 w-4" />,
+        });
+        navigate('/');
+      } else {
+        toast.error('Failed to update habit.', {
+          icon: <X className="h-4 w-4" />,
+        });
+      }
     } catch (error) {
       console.error('Failed to update habit:', error);
       toast.error('Failed to update habit.', {
@@ -63,7 +77,7 @@ const EditHabit: React.FC = () => {
     }
   };
 
-  if (isLoading) {
+  if (isLoading || sessionLoading) {
     return (
       <div className="min-h-screen bg-background text-foreground p-6 flex items-center justify-center">
         Loading habit...

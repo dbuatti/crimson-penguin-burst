@@ -5,46 +5,74 @@ import { Habit } from '@/types/habit';
 import HabitCard from '@/components/HabitCard';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { ArchiveRestore, ArrowLeft, Check, Trash2 } from 'lucide-react';
+import { ArchiveRestore, ArrowLeft, Check, Trash2, X } from 'lucide-react';
+import { useSession } from '@/components/SessionContextProvider';
 
 const ArchivedHabits: React.FC = () => {
   const [archivedHabits, setArchivedHabits] = useState<Habit[]>([]);
   const navigate = useNavigate();
+  const { session, loading: sessionLoading } = useSession();
 
-  const fetchArchivedHabits = useCallback(() => {
-    const allHabits = getHabits();
-    setArchivedHabits(allHabits.filter(h => h.archived));
-  }, []);
+  const fetchArchivedHabits = useCallback(async () => {
+    if (session) {
+      const allHabits = await getHabits(session);
+      setArchivedHabits(allHabits.filter(h => h.archived));
+    } else {
+      setArchivedHabits([]);
+    }
+  }, [session]);
 
   useEffect(() => {
-    fetchArchivedHabits();
-  }, [fetchArchivedHabits]);
+    if (!sessionLoading) {
+      fetchArchivedHabits();
+    }
+  }, [fetchArchivedHabits, sessionLoading]);
 
   const handleHabitUpdate = () => {
     fetchArchivedHabits(); // Re-fetch habits after any update (e.g., unarchive)
   };
 
-  const handleUnarchiveHabit = (id: string) => {
+  const handleUnarchiveHabit = async (id: string) => {
     const habitToUnarchive = archivedHabits.find(h => h.id === id);
     if (habitToUnarchive) {
       const updatedHabit = { ...habitToUnarchive, archived: false };
-      updateHabit(updatedHabit);
-      toast.success('Habit unarchived successfully!', {
-        icon: <Check className="h-4 w-4" />,
-      });
-      fetchArchivedHabits();
+      const result = await updateHabit(updatedHabit, session);
+      if (result) {
+        toast.success('Habit unarchived successfully!', {
+          icon: <Check className="h-4 w-4" />,
+        });
+        fetchArchivedHabits();
+      } else {
+        toast.error('Failed to unarchive habit.', {
+          icon: <X className="h-4 w-4" />,
+        });
+      }
     }
   };
 
-  const handleDeleteHabit = (id: string) => {
+  const handleDeleteHabit = async (id: string) => {
     if (window.confirm("Are you sure you want to permanently delete this habit? This action cannot be undone.")) {
-      deleteHabit(id);
-      toast.success('Habit deleted permanently!', {
-        icon: <Trash2 className="h-4 w-4" />,
-      });
-      fetchArchivedHabits();
+      const success = await deleteHabit(id, session);
+      if (success) {
+        toast.success('Habit deleted permanently!', {
+          icon: <Trash2 className="h-4 w-4" />,
+        });
+        fetchArchivedHabits();
+      } else {
+        toast.error('Failed to delete habit.', {
+          icon: <X className="h-4 w-4" />,
+        });
+      }
     }
   };
+
+  if (sessionLoading) {
+    return (
+      <div className="min-h-screen bg-background text-foreground p-6 flex items-center justify-center">
+        Loading archived habits...
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background text-foreground p-6 flex flex-col items-center">

@@ -14,6 +14,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useSession } from '@/components/SessionContextProvider';
 
 interface HabitCardProps {
   habit: Habit;
@@ -23,12 +24,15 @@ interface HabitCardProps {
 }
 
 const HabitCard: React.FC<HabitCardProps> = ({ habit, onHabitUpdate, onArchiveHabit, onDeleteHabit }) => {
+  const { session } = useSession();
   const today = new Date().toISOString().split('T')[0];
   const isCompletedToday = habit.completionDates.includes(today);
 
-  const handleToggleCompletion = (dateString: string) => {
-    toggleHabitCompletion(habit.id, dateString);
-    onHabitUpdate(); // Notify parent to re-fetch habits
+  const handleToggleCompletion = async (dateString: string) => {
+    const success = await toggleHabitCompletion(habit.id, dateString, session);
+    if (success) {
+      onHabitUpdate(); // Notify parent to re-fetch habits
+    }
   };
 
   const IconComponent = React.useMemo(() => {

@@ -1,10 +1,10 @@
-import { getHabits, saveHabits } from './habit-storage';
-import { Habit } from '@/types/habit'; // Import Habit type directly
+import { getLocalHabits, saveLocalHabits } from './habit-storage'; // Use local storage functions for file operations
+import { Habit } from '@/types/habit';
 import { toast } from 'sonner';
 import { Check, X } from 'lucide-react';
 
 export const exportHabits = (): void => {
-  const habits = getHabits();
+  const habits = getLocalHabits(); // Use local storage for export
   const dataStr = JSON.stringify(habits, null, 2);
   const blob = new Blob([dataStr], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
@@ -31,7 +31,7 @@ export const importHabits = async (file: File): Promise<void> => {
             throw new Error('Invalid habit data format.');
           }
 
-          saveHabits(importedData);
+          saveLocalHabits(importedData); // Use local storage for import
           resolve();
         } else {
           throw new Error('File read failed.');

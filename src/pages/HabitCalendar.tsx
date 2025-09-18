@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { X, Check, ChevronLeft, ChevronRight } from 'lucide-react';
 import { toast } from 'sonner';
 import { format, isSameDay, parseISO } from 'date-fns';
+import { useSession } from '@/components/SessionContextProvider';
 
 const HabitCalendar: React.FC = () => {
   const navigate = useNavigate();
@@ -14,10 +15,11 @@ const HabitCalendar: React.FC = () => {
   const [habit, setHabit] = useState<Habit | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [month, setMonth] = useState<Date>(new Date()); // State for the current month in the calendar
+  const { session, loading: sessionLoading } = useSession();
 
-  const fetchHabit = useCallback(() => {
-    if (id) {
-      const fetchedHabit = getHabitById(id);
+  const fetchHabit = useCallback(async () => {
+    if (id && session) {
+      const fetchedHabit = await getHabitById(id, session);
       if (fetchedHabit) {
         setHabit(fetchedHabit);
       } else {
@@ -28,21 +30,29 @@ const HabitCalendar: React.FC = () => {
       }
     }
     setIsLoading(false);
-  }, [id, navigate]);
+  }, [id, navigate, session]);
 
   useEffect(() => {
-    fetchHabit();
-  }, [fetchHabit]);
+    if (!sessionLoading) {
+      fetchHabit();
+    }
+  }, [fetchHabit, sessionLoading]);
 
-  const handleDateClick = (date: Date | undefined) => {
-    if (!date || !habit) return;
+  const handleDateClick = async (date: Date | undefined) => {
+    if (!date || !habit || !session) return;
 
     const dateString = format(date, 'yyyy-MM-dd');
-    toggleHabitCompletion(habit.id, dateString);
-    fetchHabit(); // Re-fetch habit to update calendar display
-    toast.success(`Habit completion for ${dateString} toggled!`, {
-      icon: <Check className="h-4 w-4" />,
-    });
+    const success = await toggleHabitCompletion(habit.id, dateString, session);
+    if (success) {
+      fetchHabit(); // Re-fetch habit to update calendar display
+      toast.success(`Habit completion for ${dateString} toggled!`, {
+        icon: <Check className="h-4 w-4" />,
+      });
+    } else {
+      toast.error('Failed to toggle habit completion.', {
+        icon: <X className="h-4 w-4" />,
+      });
+    }
   };
 
   const modifiers = {
@@ -57,7 +67,7 @@ const HabitCalendar: React.FC = () => {
     },
   };
 
-  if (isLoading) {
+  if (isLoading || sessionLoading) {
     return (
       <div className="min-h-screen bg-background text-foreground p-6 flex items-center justify-center">
         Loading calendar...

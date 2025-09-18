@@ -6,19 +6,27 @@ import HabitForm from '@/components/HabitForm';
 import { toast } from 'sonner';
 import { X, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useSession } from '@/components/SessionContextProvider';
 
 const CreateHabit: React.FC = () => {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { session } = useSession();
 
-  const handleSubmit = (data: HabitFormData) => {
+  const handleSubmit = async (data: HabitFormData) => {
     setIsSubmitting(true);
     try {
-      addHabit(data);
-      toast.success('Habit created successfully!', {
-        icon: <Check className="h-4 w-4" />,
-      });
-      navigate('/');
+      const result = await addHabit(data, session);
+      if (result) {
+        toast.success('Habit created successfully!', {
+          icon: <Check className="h-4 w-4" />,
+        });
+        navigate('/');
+      } else {
+        toast.error('Failed to create habit.', {
+          icon: <X className="h-4 w-4" />,
+        });
+      }
     } catch (error) {
       console.error('Failed to create habit:', error);
       toast.error('Failed to create habit.', {

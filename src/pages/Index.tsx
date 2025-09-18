@@ -19,40 +19,58 @@ import { ThemeToggle } from '@/components/ThemeToggle';
 
 const Index = () => {
   const [habits, setHabits] = useState<Habit[]>([]);
-  const { supabase, session } = useSession();
+  const { supabase, session, loading: sessionLoading } = useSession();
 
-  const fetchHabits = useCallback(() => {
-    const allHabits = getHabits();
-    setHabits(allHabits.filter(h => !h.archived));
-  }, []);
+  const fetchHabits = useCallback(async () => {
+    if (session) {
+      const allHabits = await getHabits(session);
+      setHabits(allHabits.filter(h => !h.archived));
+    } else {
+      setHabits([]);
+    }
+  }, [session]);
 
   useEffect(() => {
-    fetchHabits();
-  }, [fetchHabits]);
+    if (!sessionLoading) {
+      fetchHabits();
+    }
+  }, [fetchHabits, sessionLoading]);
 
   const handleHabitUpdate = () => {
     fetchHabits();
   };
 
-  const handleArchiveHabit = (id: string) => {
+  const handleArchiveHabit = async (id: string) => {
     const habitToArchive = habits.find(h => h.id === id);
     if (habitToArchive) {
       const updatedHabit = { ...habitToArchive, archived: !habitToArchive.archived };
-      updateHabit(updatedHabit);
-      toast.success(`Habit ${updatedHabit.archived ? 'archived' : 'unarchived'}!`, {
-        icon: <Check className="h-4 w-4" />,
-      });
-      fetchHabits();
+      const result = await updateHabit(updatedHabit, session);
+      if (result) {
+        toast.success(`Habit ${updatedHabit.archived ? 'archived' : 'unarchived'}!`, {
+          icon: <Check className="h-4 w-4" />,
+        });
+        fetchHabits();
+      } else {
+        toast.error('Failed to archive/unarchive habit.', {
+          icon: <X className="h-4 w-4" />,
+        });
+      }
     }
   };
 
-  const handleDeleteHabit = (id: string) => {
+  const handleDeleteHabit = async (id: string) => {
     if (window.confirm("Are you sure you want to delete this habit? This action cannot be undone.")) {
-      deleteHabit(id);
-      toast.success('Habit deleted successfully!', {
-        icon: <Check className="h-4 w-4" />,
-      });
-      fetchHabits();
+      const success = await deleteHabit(id, session);
+      if (success) {
+        toast.success('Habit deleted successfully!', {
+          icon: <Check className="h-4 w-4" />,
+        });
+        fetchHabits();
+      } else {
+        toast.error('Failed to delete habit.', {
+          icon: <X className="h-4 w-4" />,
+        });
+      }
     }
   };
 
@@ -71,7 +89,7 @@ const Index = () => {
         toast.success('Habits imported successfully! Refreshing...', {
           icon: <Upload className="h-4 w-4" />,
         });
-        fetchHabits();
+        fetchHabits(); // Re-fetch from Supabase after local import (if user wants to upload to Supabase, they'd need another action)
       } catch (error) {
         console.error('Failed to import habits:', error);
         toast.error('Failed to import habits. Please check the file format.', {
@@ -94,6 +112,14 @@ const Index = () => {
       });
     }
   };
+
+  if (sessionLoading) {
+    return (
+      <div className="min-h-screen bg-background text-foreground p-6 flex items-center justify-center">
+        Loading...
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background text-foreground p-6 flex flex-col items-center">
