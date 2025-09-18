@@ -145,6 +145,13 @@ const Index = () => {
         </div>
       ) : (
         <>
+          <div className="w-full flex justify-end mb-4">
+            <Link to="/create-habit">
+              <Button variant="ghost" size="icon" className="text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors duration-200 rounded-lg">
+                <Plus className="h-5 w-5" />
+              </Button>
+            </Link>
+          </div>
           {/* Overall Daily Progress Circle */}
           <div className="flex justify-center mb-8">
             <div className="relative flex items-center justify-center">
