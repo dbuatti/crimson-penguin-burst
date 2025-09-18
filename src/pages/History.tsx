@@ -217,7 +217,7 @@ const History: React.FC = () => {
   return (
     <div className="min-h-screen bg-background text-foreground p-6 flex flex-col items-center">
       {/* Segmented Navigation */}
-      <div className="flex items-center justify-center p-1 bg-secondary rounded-full shadow-inner border border-border mb-6">
+      <div className="flex items-center justify-center p-1 bg-secondary rounded-full shadow-inner border border-border mb-6 max-w-2xl w-full"> {/* Added max-w-2xl and w-full */}
         {tabs.map((tab) => {
           const IconComponent = tab.icon;
           return (
@@ -240,7 +240,7 @@ const History: React.FC = () => {
 
       {/* Habits Tab Content */}
       {activeTab === 'habits' && (
-        <div className="w-full max-w-md space-y-3">
+        <div className="w-full max-w-2xl space-y-3"> {/* Changed max-w-md to max-w-2xl */}
           {habitsHistory.length === 0 ? (
             <div className="text-center text-muted-foreground p-8 bg-card border border-border rounded-xl shadow-lg flex flex-col items-center justify-center">
               <Sparkles className="h-12 w-12 text-primary mb-4" />
@@ -261,7 +261,7 @@ const History: React.FC = () => {
 
       {/* Statistics Tab Content */}
       {activeTab === 'statistics' && (
-        <div className="w-full max-w-md space-y-6">
+        <div className="w-full max-w-2xl space-y-6"> {/* Changed max-w-md to max-w-2xl */}
           <OverallStatsCards
             totalCompletions={totalCompletions}
             longestStreakEver={longestStreakEver}
@@ -308,7 +308,7 @@ const History: React.FC = () => {
 
       {/* Archived Tab Content */}
       {activeTab === 'archived' && (
-        <div className="w-full max-w-md space-y-6">
+        <div className="w-full max-w-2xl space-y-6"> {/* Changed max-w-md to max-w-2xl */}
           <div className="bg-card border border-border rounded-xl shadow-lg p-6">
             <h2 className="text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
               <Archive className="h-5 w-5" />

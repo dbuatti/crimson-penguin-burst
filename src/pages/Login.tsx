@@ -6,7 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 const Login: React.FC = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <div className="w-full max-w-md p-8 bg-card border border-border rounded-lg shadow-lg">
+      <div className="w-full max-w-2xl p-8 bg-card border border-border rounded-lg shadow-lg"> {/* Changed max-w-md to max-w-2xl */}
         <h1 className="text-3xl font-bold text-center text-foreground mb-6">Welcome to HabitKit</h1>
         <Auth
           supabaseClient={supabase}

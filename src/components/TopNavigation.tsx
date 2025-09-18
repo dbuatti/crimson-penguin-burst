@@ -39,7 +39,7 @@ const TopNavigation: React.FC = () => {
   ];
 
   return (
-    <header className="w-full max-w-md flex flex-col items-center py-2 px-4">
+    <header className="w-full max-w-2xl flex flex-col items-center py-2 px-4"> {/* Changed max-w-md to max-w-2xl */}
       {/* Removed HabitKit title */}
       {/* Removed ThemeToggle and data management dropdown */}
       <SegmentedControl segments={segments} />

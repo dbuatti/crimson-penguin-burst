@@ -29,7 +29,7 @@ const Settings: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground p-6 flex flex-col items-center">
-      <div className="w-full max-w-md space-y-3 p-4 bg-card border border-border rounded-xl shadow-lg mt-4">
+      <div className="w-full max-w-2xl space-y-3 p-4 bg-card border border-border rounded-xl shadow-lg mt-4"> {/* Changed max-w-md to max-w-2xl */}
         {/* Removed the "General Settings" h2 header */}
         
         <div className="flex items-center justify-between py-2">

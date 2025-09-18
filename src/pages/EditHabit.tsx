@@ -83,7 +83,7 @@ const EditHabit: React.FC = () => {
   return (
     <div className="min-h-screen bg-background text-foreground p-6 flex flex-col items-center">
       <PageHeader title="Edit Habit" backLink="/" /> {/* Use PageHeader */}
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-2xl"> {/* Changed max-w-md to max-w-2xl */}
         <HabitForm initialData={initialData} onSubmit={handleSubmit} isSubmitting={isSubmitting} />
       </div>
     </div>

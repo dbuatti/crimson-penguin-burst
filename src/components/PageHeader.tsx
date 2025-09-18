@@ -13,7 +13,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({ title, backLink = '/', children
   const navigate = useNavigate();
 
   return (
-    <header className="w-full max-w-md flex justify-between items-center mb-8 py-2 px-4 bg-card border border-border rounded-xl shadow-lg">
+    <header className="w-full max-w-2xl flex justify-between items-center mb-8 py-2 px-4 bg-card border border-border rounded-xl shadow-lg"> {/* Changed max-w-md to max-w-2xl */}
       <Button variant="ghost" size="icon" onClick={() => navigate(backLink)} className="text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors duration-200 rounded-lg">
         <ArrowLeft className="h-5 w-5" />
       </Button>

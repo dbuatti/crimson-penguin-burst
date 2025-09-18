@@ -96,7 +96,7 @@ const HabitCalendar: React.FC = () => {
   return (
     <div className="min-h-screen bg-background text-foreground p-6 flex flex-col items-center">
       <PageHeader title={`Calendar: ${habit.name}`} backLink="/" />
-      <div className="w-full max-w-md bg-card border border-border rounded-xl shadow-lg p-4">
+      <div className="w-full max-w-2xl bg-card border border-border rounded-xl shadow-lg p-4"> {/* Changed max-w-md to max-w-2xl */}
         <Calendar
           mode="single"
           month={month}

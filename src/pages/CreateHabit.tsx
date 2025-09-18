@@ -33,7 +33,7 @@ const CreateHabit: React.FC = () => {
   return (
     <div className="min-h-screen bg-background text-foreground p-6 flex flex-col items-center">
       <PageHeader title="Create New Habit" backLink="/" /> {/* Use PageHeader */}
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-2xl"> {/* Changed max-w-md to max-w-2xl */}
         <HabitForm onSubmit={handleSubmit} isSubmitting={isSubmitting} />
       </div>
     </div>

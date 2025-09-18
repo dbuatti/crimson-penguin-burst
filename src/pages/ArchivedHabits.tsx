@@ -71,7 +71,7 @@ const ArchivedHabits: React.FC = () => {
     <div className="min-h-screen bg-background text-foreground p-6 flex flex-col items-center">
       <PageHeader title="Archived Habits" backLink="/" /> {/* Use PageHeader */}
 
-      <div className="w-full max-w-md space-y-4 mb-8">
+      <div className="w-full max-w-2xl space-y-4 mb-8"> {/* Changed max-w-md to max-w-2xl */}
         {archivedHabits.length === 0 ? (
           <div className="text-center text-muted-foreground mt-12 p-6 bg-card border border-border rounded-xl shadow-md flex flex-col items-center justify-center">
             <Sparkles className="h-12 w-12 text-primary mb-4" />

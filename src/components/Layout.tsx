@@ -6,7 +6,7 @@ import { MadeWithDyad } from './made-with-dyad';
 const Layout: React.FC = () => { // Removed LayoutProps and children prop
   return (
     <div className="min-h-screen bg-background text-foreground p-6 flex flex-col items-center">
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-2xl"> {/* Changed max-w-md to max-w-2xl */}
         <TopNavigation />
         <main className="flex flex-col items-center w-full">
           <Outlet /> {/* Use Outlet to render nested routes */}
