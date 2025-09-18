@@ -43,7 +43,7 @@ const HabitGrid: React.FC<HabitGridProps> = ({
               className="relative w-5 h-5" // Fixed size for the grid cell
             >
               {isFirstDayOfMonth && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 text-[8px] font-bold uppercase text-muted-foreground whitespace-nowrap">
+                <div className="absolute -top-12 left-1/2 -translate-x-1/2 text-[8px] font-bold uppercase text-muted-foreground whitespace-nowrap z-10">
                   {format(date, 'MMM')}
                 </div>
               )}
