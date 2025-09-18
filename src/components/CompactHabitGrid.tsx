@@ -7,7 +7,7 @@ interface CompactHabitGridProps {
   habitColor: string;
 }
 
-const WEEK_DAYS_LABELS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+const WEEK_DAYS_SHORT = ['M', 'T', 'W', 'T', 'F', 'S', 'S']; // Short labels for days
 const DOT_SIZE_PX = 16; // Each dot is 16px wide/high
 const OUTER_PADDING_PX = 8; // p-2 on the parent div means 8px padding on each side
 
@@ -56,11 +56,22 @@ const CompactHabitGrid: React.FC<CompactHabitGridProps> = ({
     dates.push(addDays(startDate, i));
   }
 
+  // Generate repeating day labels based on the number of columns
+  const repeatingDayLabels = Array.from({ length: numDotColumns }).map((_, colIndex) => 
+    WEEK_DAYS_SHORT[colIndex % 7]
+  );
+
   return (
     <div ref={containerRef} className="p-2 rounded-lg bg-secondary border border-border overflow-hidden">
-      {/* Day labels - fixed 7 columns, explicitly sized to align with dots */}
-      <div className="flex mb-1" style={{ width: `${7 * DOT_SIZE_PX}px` }}>
-        {WEEK_DAYS_LABELS.map((day, index) => (
+      {/* Day labels - dynamic columns to match the dot grid */}
+      <div
+        className="grid mb-1"
+        style={{
+          gridTemplateColumns: `repeat(${numDotColumns}, 1rem)`,
+          gridAutoRows: '1rem', // Each row height is 1rem
+        }}
+      >
+        {repeatingDayLabels.map((day, index) => (
           <div 
             key={index} 
             className="flex items-center justify-center text-xs font-medium text-muted-foreground" 
