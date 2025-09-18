@@ -2,7 +2,6 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { getHabits, getHabitCompletionLogs } from '@/lib/habit-storage';
 import { Habit } from '@/types/habit';
 import { useSession } from '@/components/SessionContextProvider';
-import PageHeader from '@/components/PageHeader';
 import HistoryHabitCard from '@/components/HistoryHabitCard';
 import { Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -52,7 +51,7 @@ const History: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground p-6 flex flex-col items-center">
-      <PageHeader title="" backLink="/" /> {/* Removed the title "Habit History" */}
+      {/* Removed PageHeader component */}
 
       <div className="w-full max-w-md space-y-6 mb-8">
         {habitsHistory.length === 0 ? (
