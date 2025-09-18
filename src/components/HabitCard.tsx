@@ -56,7 +56,7 @@ const HabitCard: React.FC<HabitCardProps> = ({ habit, onHabitUpdate, onArchiveHa
           <Checkbox
             id={`habit-${habit.id}`}
             checked={isCompletedToday}
-            onCheckedChange={() => handleToggleCompletion(today)} // Use today's date for checkbox
+            onCheckedChange={() => handleToggleCompletion(today)} // Pass today's date
             className="h-6 w-6 rounded-full border-2 transition-colors duration-200
                        data-[state=unchecked]:bg-secondary data-[state=unchecked]:border-border 
                        data-[state=checked]:text-primary-foreground"
