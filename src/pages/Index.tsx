@@ -2,12 +2,12 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { getHabits, updateHabit, deleteHabit, toggleHabitCompletion, incrementHabitCompletion, decrementHabitCompletion } from '@/lib/habit-storage';
 import { Habit } from '@/types/habit';
-import { Plus, Sparkles, Edit } from 'lucide-react';
+import { Plus, Sparkles } from 'lucide-react'; // Removed Edit icon import
 import { Button } from '@/components/ui/button';
 import { showSuccess, showError } from '@/utils/toast';
 import { useSession } from '@/components/SessionContextProvider';
 import HabitListItem from '@/components/HabitListItem';
-import CircularProgress from '@/components/CircularProgress'; // Import the new CircularProgress component
+import CircularProgress from '@/components/CircularProgress';
 
 const Index = () => {
   const [habits, setHabits] = useState<Habit[]>([]);
@@ -123,9 +123,7 @@ const Index = () => {
           <div className="w-full flex items-center justify-between mb-8">
             <h1 className="text-3xl font-extrabold text-foreground tracking-tight">Today</h1>
             <div className="flex space-x-2">
-              <Button variant="ghost" size="icon" className="text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors duration-200 rounded-lg">
-                <Edit className="h-5 w-5" />
-              </Button>
+              {/* Removed the Edit button */}
               <Link to="/create-habit">
                 <Button variant="ghost" size="icon" className="text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors duration-200 rounded-lg">
                   <Plus className="h-5 w-5" />
