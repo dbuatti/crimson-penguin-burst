@@ -1,5 +1,5 @@
 import React from 'react';
-import PageHeader from '@/components/PageHeader';
+// Removed PageHeader import
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Archive, Upload, Download } from 'lucide-react';
@@ -29,7 +29,8 @@ const Settings: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground p-6 flex flex-col items-center">
-      <PageHeader title="Settings" backLink="/" />
+      {/* Removed PageHeader title="Settings" backLink="/" */}
+      <h1 className="text-3xl font-extrabold text-foreground tracking-tight mb-8">Settings</h1>
       <div className="w-full max-w-md space-y-4 p-6 bg-card border border-border rounded-xl shadow-lg">
         <h2 className="text-xl font-semibold text-foreground mb-4">General Settings</h2>
         
