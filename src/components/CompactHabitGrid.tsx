@@ -1,73 +1,81 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { cn } from '@/lib/utils';
-import { format, startOfWeek, addDays, subWeeks } from 'date-fns';
+import { format, addDays, subDays } from 'date-fns';
 
 interface CompactHabitGridProps {
   completionDates: string[];
   habitColor: string;
 }
 
-const WEEK_DAYS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+const WEEK_DAYS_LABELS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+const DOT_SIZE_PX = 16; // Each dot is 16px wide/high
+const OUTER_PADDING_PX = 8; // p-2 on the parent div means 8px padding on each side
 
-// Function to determine the number of weeks based on screen width
-const calculateWeeksToShow = (width: number): number => {
-  if (width < 640) { // Small screens (e.g., mobile portrait)
-    return 4;
-  } else if (width < 768) { // Medium screens (e.g., mobile landscape, small tablets)
-    return 6;
-  } else if (width < 1024) { // Large screens (e.g., tablets, small laptops)
-    return 8;
-  } else if (width < 1280) { // Larger screens
-    return 10;
-  } else { // Extra large screens
-    return 12;
-  }
-};
+// Fixed number of rows for the dot grid to fill vertical space
+const NUM_DOT_ROWS = 10; 
 
 const CompactHabitGrid: React.FC<CompactHabitGridProps> = ({
   completionDates,
   habitColor,
 }) => {
-  const [numWeeksToShow, setNumWeeksToShow] = useState(calculateWeeksToShow(window.innerWidth));
+  const [numDotColumns, setNumDotColumns] = useState(0); // Number of columns for the dot grid
+  const containerRef = useRef<HTMLDivElement>(null); // Ref for the container div
 
-  const handleResize = useCallback(() => {
-    setNumWeeksToShow(calculateWeeksToShow(window.innerWidth));
+  const calculateGridDimensions = useCallback(() => {
+    if (containerRef.current) {
+      const currentContainerWidth = containerRef.current.clientWidth;
+      
+      // Calculate how many dots can fit horizontally
+      // Subtract the outer padding from the effective width
+      const effectiveWidthForDots = currentContainerWidth - (2 * OUTER_PADDING_PX);
+      const calculatedColumns = Math.floor(effectiveWidthForDots / DOT_SIZE_PX);
+      setNumDotColumns(Math.max(1, calculatedColumns)); // Ensure at least 1 column
+    }
   }, []);
 
   useEffect(() => {
-    // Set initial value on mount
-    handleResize();
-    window.addEventListener('resize', handleResize);
+    calculateGridDimensions(); // Set initial value
+    window.addEventListener('resize', calculateGridDimensions);
     return () => {
-      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('resize', calculateGridDimensions);
     };
-  }, [handleResize]);
+  }, [calculateGridDimensions]);
 
   const today = new Date();
   today.setHours(0, 0, 0, 0); // Normalize today to start of day
 
-  const startOfCurrentWeek = startOfWeek(today, { weekStartsOn: 1 }); // Monday of the current week
-  // Calculate grid start date based on dynamic numWeeksToShow
-  const gridStartDate = subWeeks(startOfCurrentWeek, numWeeksToShow - 1);
-
   const dates: Date[] = [];
-  for (let i = 0; i < numWeeksToShow * 7; i++) {
-    dates.push(addDays(gridStartDate, i));
+  const totalDots = numDotColumns * NUM_DOT_ROWS;
+
+  // Generate dates starting from the earliest date needed to fill the grid, up to today.
+  // The last dot in the grid should be today.
+  // So, the first dot is `today - (totalDots - 1) days`.
+  const startDate = subDays(today, totalDots - 1);
+
+  for (let i = 0; i < totalDots; i++) {
+    dates.push(addDays(startDate, i));
   }
 
   return (
-    <div className="p-2 rounded-lg bg-secondary border border-border overflow-hidden">
-      {/* Day labels */}
+    <div ref={containerRef} className="p-2 rounded-lg bg-secondary border border-border overflow-hidden">
+      {/* Day labels - fixed 7 columns, aligned with the first 7 dots */}
+      {/* This header will only span the width of 7 dots, as per the image */}
       <div className="grid grid-cols-[repeat(7,1rem)] mb-1">
-        {WEEK_DAYS.map((day, index) => (
+        {WEEK_DAYS_LABELS.map((day, index) => (
           <div key={index} className="flex items-center justify-center text-xs font-medium text-muted-foreground w-4 h-4">
             {day}
           </div>
         ))}
       </div>
 
-      {/* Habit completion grid */}
-      <div className="grid grid-cols-[repeat(7,1rem)]">
+      {/* Habit completion grid - dynamic columns to fill width */}
+      <div
+        className="grid"
+        style={{
+          gridTemplateColumns: `repeat(${numDotColumns}, 1rem)`,
+          gridAutoRows: '1rem', // Each row height is 1rem
+        }}
+      >
         {dates.map((date, index) => {
           const dateFormatted = format(date, 'yyyy-MM-dd');
           const isCompleted = completionDates.includes(dateFormatted);
