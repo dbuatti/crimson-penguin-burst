@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { getHabits, getHabitCompletionLogs } from '@/lib/habit-storage';
 import { Habit } from '@/types/habit';
 import { useSession } from '@/components/SessionContextProvider';
-import HistoryHabitCard from '@/components/HistoryHabitCard';
+import CompactHabitCard from '@/components/CompactHabitCard';
 import { Sparkles, BarChart3, Archive, TrendingUp, Calendar, Target } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
@@ -83,7 +83,7 @@ const History: React.FC = () => {
 
       {/* Habits Tab Content */}
       {activeTab === 'habits' && (
-        <div className="w-full max-w-md space-y-6">
+        <div className="w-full max-w-md space-y-3">
           {habitsHistory.length === 0 ? (
             <div className="text-center text-muted-foreground p-8 bg-card border border-border rounded-xl shadow-lg flex flex-col items-center justify-center">
               <Sparkles className="h-12 w-12 text-primary mb-4" />
@@ -96,7 +96,7 @@ const History: React.FC = () => {
             </div>
           ) : (
             habitsHistory.map(({ habit, completionDates }) => (
-              <HistoryHabitCard key={habit.id} habit={habit} completionDates={completionDates} />
+              <CompactHabitCard key={habit.id} habit={habit} completionDates={completionDates} />
             ))
           )}
         </div>
