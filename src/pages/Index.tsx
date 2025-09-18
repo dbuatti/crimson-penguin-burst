@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom'; // Import useNavigate
 import { getHabits, updateHabit, deleteHabit } from '@/lib/habit-storage';
 import { Habit } from '@/types/habit';
 import HabitCard from '@/components/HabitCard';
@@ -20,6 +20,7 @@ import { ThemeToggle } from '@/components/ThemeToggle';
 const Index = () => {
   const [habits, setHabits] = useState<Habit[]>([]);
   const { supabase, session, loading: sessionLoading } = useSession();
+  const navigate = useNavigate(); // Initialize useNavigate
 
   const fetchHabits = useCallback(async () => {
     if (session) {
@@ -102,8 +103,8 @@ const Index = () => {
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) {
-      console.error('Logout error details:', error); // Added detailed error logging
-      toast.error('Failed to log out.', {
+      console.error('Logout error details:', error);
+      toast.error('Logout attempted, but an error occurred. Redirecting...', { // More informative message
         icon: <X className="h-4 w-4" />,
       });
     } else {
@@ -111,6 +112,8 @@ const Index = () => {
         icon: <Check className="h-4 w-4" />,
       });
     }
+    // Always navigate to login after logout attempt, regardless of API success
+    navigate('/login');
   };
 
   if (sessionLoading) {
