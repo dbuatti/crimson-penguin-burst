@@ -11,13 +11,13 @@ import HabitCalendar from "./pages/HabitCalendar";
 import ArchivedHabits from "./pages/ArchivedHabits";
 import Login from "./pages/Login";
 import { SessionContextProvider } from "./components/SessionContextProvider";
-import { ThemeProvider } from "./components/ThemeProvider"; // Import ThemeProvider
+import { ThemeProvider } from "./components/ThemeProvider";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme"> {/* Wrap with ThemeProvider */}
+    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
       <TooltipProvider>
         <Toaster />
         <Sonner />
