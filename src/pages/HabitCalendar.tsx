@@ -5,7 +5,7 @@ import { Habit } from '@/types/habit';
 import { Calendar } from '@/components/ui/calendar';
 import { Button } from '@/components/ui/button';
 import { X, Check, ChevronLeft, ChevronRight } from 'lucide-react';
-import { toast } from 'sonner';
+import { showError, showSuccess } from '@/utils/toast'; // Changed import
 import { format, isSameDay, parseISO } from 'date-fns';
 import { useSession } from '@/components/SessionContextProvider';
 
@@ -23,7 +23,7 @@ const HabitCalendar: React.FC = () => {
       if (fetchedHabit) {
         setHabit(fetchedHabit);
       } else {
-        toast.error('Habit not found.', {
+        showError('Habit not found.', {
           icon: <X className="h-4 w-4" />,
         });
         navigate('/');
@@ -45,11 +45,11 @@ const HabitCalendar: React.FC = () => {
     const success = await toggleHabitCompletion(habit.id, dateString, session);
     if (success) {
       fetchHabit(); // Re-fetch habit to update calendar display
-      toast.success(`Habit completion for ${dateString} toggled!`, {
+      showSuccess(`Habit completion for ${dateString} toggled!`, {
         icon: <Check className="h-4 w-4" />,
       });
     } else {
-      toast.error('Failed to toggle habit completion.', {
+      showError('Failed to toggle habit completion.', {
         icon: <X className="h-4 w-4" />,
       });
     }

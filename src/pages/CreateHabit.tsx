@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { addHabit } from '@/lib/habit-storage';
 import { HabitFormData } from '@/types/habit';
 import HabitForm from '@/components/HabitForm';
-import { toast } from 'sonner';
+import { showError, showSuccess } from '@/utils/toast'; // Changed import
 import { X, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useSession } from '@/components/SessionContextProvider';
@@ -18,18 +18,18 @@ const CreateHabit: React.FC = () => {
     try {
       const result = await addHabit(data, session);
       if (result) {
-        toast.success('Habit created successfully!', {
+        showSuccess('Habit created successfully!', {
           icon: <Check className="h-4 w-4" />,
         });
         navigate('/');
       } else {
-        toast.error('Failed to create habit.', {
+        showError('Failed to create habit.', {
           icon: <X className="h-4 w-4" />,
         });
       }
     } catch (error) {
       console.error('Failed to create habit:', error);
-      toast.error('Failed to create habit.', {
+      showError('Failed to create habit.', {
         icon: <X className="h-4 w-4" />,
       });
     } finally {

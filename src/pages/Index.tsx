@@ -6,7 +6,7 @@ import HabitCard from '@/components/HabitCard';
 import { MadeWithDyad } from "@/components/made-with-dyad";
 import { Plus, Settings, Archive, Check, Upload, Download, X, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { toast } from 'sonner';
+import { showError, showSuccess } from '@/utils/toast'; // Changed import
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -47,12 +47,12 @@ const Index = () => {
       const updatedHabit = { ...habitToArchive, archived: !habitToArchive.archived };
       const result = await updateHabit(updatedHabit, session);
       if (result) {
-        toast.success(`Habit ${updatedHabit.archived ? 'archived' : 'unarchived'}!`, {
+        showSuccess(`Habit ${updatedHabit.archived ? 'archived' : 'unarchived'}!`, {
           icon: <Check className="h-4 w-4" />,
         });
         fetchHabits();
       } else {
-        toast.error('Failed to archive/unarchive habit.', {
+        showError('Failed to archive/unarchive habit.', {
           icon: <X className="h-4 w-4" />,
         });
       }
@@ -63,12 +63,12 @@ const Index = () => {
     if (window.confirm("Are you sure you want to delete this habit? This action cannot be undone.")) {
       const success = await deleteHabit(id, session);
       if (success) {
-        toast.success('Habit deleted successfully!', {
+        showSuccess('Habit deleted successfully!', {
           icon: <Check className="h-4 w-4" />,
         });
         fetchHabits();
       } else {
-        toast.error('Failed to delete habit.', {
+        showError('Failed to delete habit.', {
           icon: <X className="h-4 w-4" />,
         });
       }
@@ -77,9 +77,7 @@ const Index = () => {
 
   const handleExport = async () => {
     await exportHabits(session);
-    toast.success('Habits exported successfully!', {
-      icon: <Download className="h-4 w-4" />,
-    });
+    // The toast for export success is now handled within exportHabits itself.
   };
 
   const handleImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -87,15 +85,10 @@ const Index = () => {
     if (file) {
       try {
         await importHabits(file, session);
-        toast.success('Habits imported successfully! Refreshing...', {
-          icon: <Upload className="h-4 w-4" />,
-        });
+        // The toast for import success/failure is now handled within importHabits itself.
         fetchHabits();
       } catch (error) {
         console.error('Failed to import habits:', error);
-        toast.error('Failed to import habits. Please check the file format.', {
-          icon: <X className="h-4 w-4" />,
-        });
       }
     }
   };
@@ -104,11 +97,11 @@ const Index = () => {
     const { error } = await supabase.auth.signOut();
     if (error) {
       console.error('Logout error details:', error);
-      toast.error('Logout attempted, but an error occurred. Redirecting...', {
+      showError('Logout attempted, but an error occurred. Redirecting...', {
         icon: <X className="h-4 w-4" />,
       });
     } else {
-      toast.success('Logged out successfully!', {
+      showSuccess('Logged out successfully!', {
         icon: <Check className="h-4 w-4" />,
       });
     }

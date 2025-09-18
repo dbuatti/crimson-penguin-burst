@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { getHabitById, updateHabit } from '@/lib/habit-storage';
 import { HabitFormData, Habit } from '@/types/habit';
 import HabitForm from '@/components/HabitForm';
-import { toast } from 'sonner';
+import { showError, showSuccess } from '@/utils/toast'; // Changed import
 import { X, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useSession } from '@/components/SessionContextProvider';
@@ -32,7 +32,7 @@ const EditHabit: React.FC = () => {
           reminders: fetchedHabit.reminders,
         });
       } else {
-        toast.error('Habit not found.', {
+        showError('Habit not found.', {
           icon: <X className="h-4 w-4" />,
         });
         navigate('/');
@@ -58,18 +58,18 @@ const EditHabit: React.FC = () => {
       };
       const result = await updateHabit(updatedHabit, session);
       if (result) {
-        toast.success('Habit updated successfully!', {
+        showSuccess('Habit updated successfully!', {
           icon: <Check className="h-4 w-4" />,
         });
         navigate('/');
       } else {
-        toast.error('Failed to update habit.', {
+        showError('Failed to update habit.', {
           icon: <X className="h-4 w-4" />,
         });
       }
     } catch (error) {
       console.error('Failed to update habit:', error);
-      toast.error('Failed to update habit.', {
+      showError('Failed to update habit.', {
         icon: <X className="h-4 w-4" />,
       });
     } finally {
