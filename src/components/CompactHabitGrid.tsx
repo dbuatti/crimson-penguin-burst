@@ -58,11 +58,14 @@ const CompactHabitGrid: React.FC<CompactHabitGridProps> = ({
 
   return (
     <div ref={containerRef} className="p-2 rounded-lg bg-secondary border border-border overflow-hidden">
-      {/* Day labels - fixed 7 columns, aligned with the first 7 dots */}
-      {/* This header will only span the width of 7 dots, as per the image */}
-      <div className="grid grid-cols-[repeat(7,1rem)] mb-1">
+      {/* Day labels - fixed 7 columns, explicitly sized to align with dots */}
+      <div className="flex mb-1" style={{ width: `${7 * DOT_SIZE_PX}px` }}>
         {WEEK_DAYS_LABELS.map((day, index) => (
-          <div key={index} className="flex items-center justify-center text-xs font-medium text-muted-foreground w-4 h-4">
+          <div 
+            key={index} 
+            className="flex items-center justify-center text-xs font-medium text-muted-foreground" 
+            style={{ width: `${DOT_SIZE_PX}px`, height: `${DOT_SIZE_PX}px` }} // Explicitly set size
+          >
             {day}
           </div>
         ))}
