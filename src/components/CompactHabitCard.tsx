@@ -38,6 +38,13 @@ const CompactHabitCard: React.FC<CompactHabitCardProps> = ({ habit, completionDa
             {completionDates.length} completions
           </div>
         </div>
+        
+        {/* Completion count display */}
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-xs text-muted-foreground">Completion count</span>
+          <span className="text-sm font-medium text-foreground">{completionDates.length}</span>
+        </div>
+        
         <CompactHabitGrid completionDates={completionDates} habitColor={habit.color} />
       </CardContent>
     </Card>
