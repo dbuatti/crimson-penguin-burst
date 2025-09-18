@@ -8,7 +8,8 @@ interface CompactHabitGridProps {
 }
 
 const WEEK_DAYS_SHORT = ['M', 'T', 'W', 'T', 'F', 'S', 'S']; // Short labels for days
-const DOT_SIZE_PX = 16; // Each dot is 16px wide/high
+const DOT_SIZE_PX = 16; // Each dot is 16px wide/high (1rem)
+const GAP_SIZE_PX = 4; // Equivalent to Tailwind's gap-1 (0.25rem)
 const OUTER_PADDING_PX = 8; // p-2 on the parent div means 8px padding on each side
 
 // Fixed number of rows for the dot grid to fill vertical space
@@ -25,10 +26,12 @@ const CompactHabitGrid: React.FC<CompactHabitGridProps> = ({
     if (containerRef.current) {
       const currentContainerWidth = containerRef.current.clientWidth;
       
-      // Calculate how many dots can fit horizontally
-      // Subtract the outer padding from the effective width
+      // Calculate how many dots can fit horizontally, accounting for padding and gaps
       const effectiveWidthForDots = currentContainerWidth - (2 * OUTER_PADDING_PX);
-      const calculatedColumns = Math.floor(effectiveWidthForDots / DOT_SIZE_PX);
+      // Each column effectively takes DOT_SIZE_PX + GAP_SIZE_PX, except the last one
+      // So, total width = numColumns * (DOT_SIZE_PX + GAP_SIZE_PX) - GAP_SIZE_PX
+      // numColumns = (total width + GAP_SIZE_PX) / (DOT_SIZE_PX + GAP_SIZE_PX)
+      const calculatedColumns = Math.floor((effectiveWidthForDots + GAP_SIZE_PX) / (DOT_SIZE_PX + GAP_SIZE_PX));
       setNumDotColumns(Math.max(1, calculatedColumns)); // Ensure at least 1 column
     }
   }, []);
@@ -65,9 +68,9 @@ const CompactHabitGrid: React.FC<CompactHabitGridProps> = ({
     <div ref={containerRef} className="p-2 rounded-lg bg-secondary border border-border overflow-hidden">
       {/* Day labels - dynamic columns to match the dot grid */}
       <div
-        className="grid mb-1"
+        className="grid gap-1 mb-1" // Added gap-1 here
         style={{
-          gridTemplateColumns: `repeat(${numDotColumns}, 1rem)`,
+          gridTemplateColumns: `repeat(${numDotColumns}, 1rem)`, // Use 1rem for dot size, gap-1 for gap
           gridAutoRows: '1rem', // Each row height is 1rem
         }}
       >
@@ -75,7 +78,6 @@ const CompactHabitGrid: React.FC<CompactHabitGridProps> = ({
           <div 
             key={index} 
             className="flex items-center justify-center text-xs font-medium text-muted-foreground" 
-            style={{ width: `${DOT_SIZE_PX}px`, height: `${DOT_SIZE_PX}px` }} // Explicitly set size
           >
             {day}
           </div>
@@ -84,7 +86,7 @@ const CompactHabitGrid: React.FC<CompactHabitGridProps> = ({
 
       {/* Habit completion grid - dynamic columns to fill width */}
       <div
-        className="grid"
+        className="grid gap-1" // Added gap-1 here
         style={{
           gridTemplateColumns: `repeat(${numDotColumns}, 1rem)`,
           gridAutoRows: '1rem', // Each row height is 1rem
