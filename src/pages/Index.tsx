@@ -120,7 +120,7 @@ const Index = () => {
         </div>
       ) : (
         <>
-          <div className="w-full flex items-center justify-between mb-8">
+          <div className="w-full flex items-center justify-between mb-4">
             <h1 className="text-3xl font-extrabold text-foreground tracking-tight">Today</h1>
             <div className="flex space-x-2">
               {/* Removed the Edit button */}

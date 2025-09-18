@@ -53,7 +53,7 @@ const History: React.FC = () => {
     <div className="min-h-screen bg-background text-foreground p-6 flex flex-col items-center">
       {/* Removed PageHeader component */}
 
-      <div className="w-full max-w-md space-y-6 mb-8">
+      <div className="w-full max-w-md space-y-6 mb-4">
         {habitsHistory.length === 0 ? (
           <div className="text-center text-muted-foreground mt-12 p-8 bg-card border border-border rounded-xl shadow-lg flex flex-col items-center justify-center">
             <Sparkles className="h-12 w-12 text-primary mb-4" />
