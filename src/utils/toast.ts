@@ -1,11 +1,16 @@
 import { toast, type ExternalToast } from "sonner";
 import React from 'react'; // Required for JSX in toast options
 
-export const showSuccess = (message: string, options?: ExternalToast) => {
+// Define a custom type that extends ExternalToast to explicitly include React.ReactNode for icon
+interface ToastOptionsWithIcon extends ExternalToast {
+  icon?: React.ReactNode;
+}
+
+export const showSuccess = (message: string, options?: ToastOptionsWithIcon) => {
   toast.success(message, options);
 };
 
-export const showError = (message: string, options?: ExternalToast) => {
+export const showError = (message: string, options?: ToastOptionsWithIcon) => {
   toast.error(message, options);
 };
 

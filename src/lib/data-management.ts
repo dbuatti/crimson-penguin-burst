@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Session } from '@supabase/supabase-js';
 import { showError, showSuccess } from '@/utils/toast'; // Import from project's utility
 import { Habit, HabitId, HabitFormData } from "@/types/habit";
+import { format } from 'date-fns'; // Import format from date-fns
 
 // Helper to get the current user's ID
 const getUserId = (session: Session | null): string | null => {
