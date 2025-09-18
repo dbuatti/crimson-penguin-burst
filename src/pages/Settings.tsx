@@ -29,10 +29,10 @@ const Settings: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground p-6 flex flex-col items-center">
-      <div className="w-full max-w-md space-y-4 p-6 bg-card border border-border rounded-xl shadow-lg">
+      <div className="w-full max-w-md space-y-3 p-4 bg-card border border-border rounded-xl shadow-lg mt-4">
         {/* Removed the "General Settings" h2 header */}
         
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between py-2">
           <span className="text-foreground">Theme</span>
           <ThemeToggle />
         </div>
@@ -43,7 +43,7 @@ const Settings: React.FC = () => {
           </Button>
         </Link>
 
-        <h2 className="text-xl font-semibold text-foreground mt-8 mb-4">Data Management</h2>
+        <h2 className="text-xl font-semibold text-foreground mt-6 mb-2">Data Management</h2>
         <Button onClick={handleExport} variant="outline" className="w-full justify-start bg-secondary border-border text-secondary-foreground hover:bg-accent hover:text-accent-foreground transition-colors duration-200 rounded-lg">
           <Download className="mr-2 h-4 w-4" /> Export Data
         </Button>
@@ -57,7 +57,7 @@ const Settings: React.FC = () => {
           />
         </Button>
 
-        <p className="text-muted-foreground text-sm mt-4">
+        <p className="text-muted-foreground text-sm pt-2">
           More settings will be available here soon.
         </p>
       </div>

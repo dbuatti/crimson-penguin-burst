@@ -53,9 +53,9 @@ const History: React.FC = () => {
     <div className="min-h-screen bg-background text-foreground p-6 flex flex-col items-center">
       {/* Removed PageHeader component */}
 
-      <div className="w-full max-w-md space-y-6 mb-4">
+      <div className="w-full max-w-md space-y-6 mt-4 mb-4">
         {habitsHistory.length === 0 ? (
-          <div className="text-center text-muted-foreground mt-12 p-8 bg-card border border-border rounded-xl shadow-lg flex flex-col items-center justify-center">
+          <div className="text-center text-muted-foreground mt-6 p-8 bg-card border border-border rounded-xl shadow-lg flex flex-col items-center justify-center">
             <Sparkles className="h-12 w-12 text-primary mb-4" />
             <p className="text-xl font-semibold mb-4">No active habits to show history for.</p>
             <Link to="/create-habit">
