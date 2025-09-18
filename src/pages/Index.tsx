@@ -198,9 +198,9 @@ const Index = () => {
                   onHabitUpdate={handleHabitUpdate}
                   onArchiveHabit={handleArchiveHabit}
                   onDeleteHabit={handleDeleteHabit}
-                  onToggleCompletion={toggleHabitCompletion}
-                  onIncrementCompletion={incrementHabitCompletion}
-                  onDecrementCompletion={decrementHabtCompletion}
+                  onToggleCompletion={(habitId, dateString) => toggleHabitCompletion(habitId, dateString, session)}
+                  onIncrementCompletion={(habitId, dateString) => incrementHabitCompletion(habitId, dateString, session)}
+                  onDecrementCompletion={(habitId, dateString) => decrementHabitCompletion(habitId, dateString, session)}
                 />
               ))}
             </div>
@@ -217,9 +217,9 @@ const Index = () => {
                       onHabitUpdate={handleHabitUpdate}
                       onArchiveHabit={handleArchiveHabit}
                       onDeleteHabit={handleDeleteHabit}
-                      onToggleCompletion={toggleHabitCompletion}
-                      onIncrementCompletion={incrementHabitCompletion}
-                      onDecrementCompletion={decrementHabitCompletion}
+                      onToggleCompletion={(habitId, dateString) => toggleHabitCompletion(habitId, dateString, session)}
+                      onIncrementCompletion={(habitId, dateString) => incrementHabitCompletion(habitId, dateString, session)}
+                      onDecrementCompletion={(habitId, dateString) => decrementHabitCompletion(habitId, dateString, session)}
                     />
                   ))}
                 </div>
