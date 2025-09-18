@@ -21,10 +21,10 @@
     --secondary: 210 40% 96.1%; /* Very light gray */
     --secondary-foreground: 222.2 47.4% 11.2%;
 
-    --muted: 210 30% 90%; /* Slightly darker gray for muted elements */
+    --muted: 210 20% 80%; /* Darker gray for past incomplete days (skipped) */
     --muted-foreground: 215.4 16.3% 46.9%;
 
-    --accent: 210 40% 93%; /* Distinct gray for accent/hover states */
+    --accent: 210 40% 93%; /* Distinct gray for accent/hover states and current/future incomplete days */
     --accent-foreground: 222.2 47.4% 11.2%;
 
     --destructive: 0 84.2% 60.2%;
