@@ -19,6 +19,34 @@ const CompactHabitCard: React.FC<CompactHabitCardProps> = ({ habit, completionDa
     return Circle;
   }, [habit.icon]);
 
+  // Calculate longest streak
+  const calculateLongestStreak = (dates: string[]): number => {
+    if (dates.length === 0) return 0;
+    
+    const sortedDates = dates.sort();
+    let longestStreak = 1;
+    let currentStreak = 1;
+    
+    for (let i = 1; i < sortedDates.length; i++) {
+      const currentDate = new Date(sortedDates[i]);
+      const prevDate = new Date(sortedDates[i - 1]);
+      const diffTime = currentDate.getTime() - prevDate.getTime();
+      const diffDays = diffTime / (1000 * 60 * 60 * 24);
+      
+      if (diffDays === 1) {
+        currentStreak++;
+        longestStreak = Math.max(longestStreak, currentStreak);
+      } else {
+        currentStreak = 1;
+      }
+    }
+    
+    return longestStreak;
+  };
+
+  const longestStreak = calculateLongestStreak(completionDates);
+  const totalCompletions = completionDates.length;
+
   return (
     <Card className="w-full bg-card text-foreground border border-border rounded-xl shadow-sm">
       <CardContent className="p-4">
@@ -39,10 +67,19 @@ const CompactHabitCard: React.FC<CompactHabitCardProps> = ({ habit, completionDa
           </div>
         </div>
         
-        {/* Completion count display */}
+        {/* Streaks display */}
         <div className="flex items-center justify-between mb-3">
-          <span className="text-xs text-muted-foreground">Completion count</span>
-          <span className="text-sm font-medium text-foreground">{completionDates.length}</span>
+          <div className="flex items-center space-x-4">
+            <div className="text-xs text-muted-foreground">
+              <span className="font-medium text-foreground">Streaks:</span>
+            </div>
+            <div className="text-xs text-muted-foreground">
+              <span className="font-medium text-foreground">Longest:</span> {longestStreak}
+            </div>
+            <div className="text-xs text-muted-foreground">
+              <span className="font-medium text-foreground">Completed:</span> {totalCompletions}
+            </div>
+          </div>
         </div>
         
         <CompactHabitGrid completionDates={completionDates} habitColor={habit.color} />
