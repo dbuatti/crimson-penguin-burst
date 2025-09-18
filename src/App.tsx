@@ -19,7 +19,7 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <BrowserRouter>
+      <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}> {/* Added future flags */}
         <SessionContextProvider> {/* Wrap the entire app with SessionContextProvider */}
           <Routes>
             <Route path="/" element={<Index />} />
