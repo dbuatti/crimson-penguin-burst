@@ -182,6 +182,25 @@ export const getWeeklyHabitCompletionSummary = async (session: Session | null, w
   }
 };
 
+export const getMonthlyHabitCompletionSummary = async (session: Session | null, months: number = 12, endDate: Date = new Date()): Promise<{ month_start_date: string; completion_percentage: number }[]> => {
+  const userId = getUserId(session);
+  if (!userId) return [];
+
+  try {
+    const { data, error } = await supabase
+      .rpc('get_monthly_habit_completion_summary', { p_user_id: userId, p_months: months, p_end_date: format(endDate, 'yyyy-MM-dd') });
+
+    if (error) {
+      console.error("Failed to fetch monthly habit completion summary:", error);
+      return [];
+    }
+    return data || [];
+  } catch (error) {
+    console.error("Failed to fetch monthly habit completion summary:", error);
+    return [];
+  }
+};
+
 
 export const addHabit = async (newHabitData: HabitFormData, session: Session | null): Promise<Habit | null> => {
   const userId = getUserId(session);

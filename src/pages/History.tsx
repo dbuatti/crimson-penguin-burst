@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { getHabits, getHabitCompletionLogs, getAllHabitLogs, getDailyHabitCompletionSummary, getWeeklyHabitCompletionSummary } from '@/lib/habit-storage';
+import { getHabits, getHabitCompletionLogs, getAllHabitLogs, getDailyHabitCompletionSummary, getWeeklyHabitCompletionSummary, getMonthlyHabitCompletionSummary } from '@/lib/habit-storage';
 import { Habit } from '@/types/habit';
 import { useSession } from '@/components/SessionContextProvider';
 import CompactHabitCard from '@/components/CompactHabitCard';
@@ -25,12 +25,12 @@ const tabs = [
   { id: 'habits', label: 'Habits', icon: ListTodo },
   { id: 'statistics', label: 'Statistics', icon: BarChart3 },
   { id: 'archived', label: 'Archived', icon: Archive },
-] as const; // Added 'as const' here
+] as const;
 
 const History: React.FC = () => {
   const [habitsHistory, setHabitsHistory] = useState<HabitHistory[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<typeof tabs[number]['id']>('habits'); // Use typeof tabs[number]['id'] for type safety
+  const [activeTab, setActiveTab] = useState<typeof tabs[number]['id']>('habits');
   const { session, loading: sessionLoading } = useSession();
 
   // Overall Stats
@@ -49,6 +49,12 @@ const History: React.FC = () => {
   const [weeklyAvgPercentage, setWeeklyAvgPercentage] = useState(0);
   const [weeklyTimeRange, setWeeklyTimeRange] = useState('16W'); // Default to 16 weeks
   const [weeklyDateOffset, setWeeklyDateOffset] = useState(0); // Offset in weeks/months
+
+  // Monthly Chart State
+  const [monthlyChartData, setMonthlyChartData] = useState<ChartDataPoint[]>([]);
+  const [monthlyAvgPercentage, setMonthlyAvgPercentage] = useState(0);
+  const [monthlyTimeRange, setMonthlyTimeRange] = useState('12M'); // Default to 12 months
+  const [monthlyDateOffset, setMonthlyDateOffset] = useState(0); // Offset in months
 
   const fetchHabitsAndHistory = useCallback(async () => {
     if (session) {
@@ -86,8 +92,6 @@ const History: React.FC = () => {
     if (!session) return;
 
     let daysToFetch = 30; // Default for 31D
-    let currentEndDate = startOfDay(new Date());
-
     if (dailyTimeRange === '7D') {
       daysToFetch = 7;
     } else if (dailyTimeRange === '31D') {
@@ -98,10 +102,10 @@ const History: React.FC = () => {
       daysToFetch = 365;
     }
 
-    // Adjust the end date based on the offset
-    const adjustedEndDate = subDays(currentEndDate, daysToFetch * dailyDateOffset);
+    // Calculate the end date for the current view based on the offset
+    const currentViewEndDate = subDays(startOfDay(new Date()), daysToFetch * dailyDateOffset);
 
-    const data = await getDailyHabitCompletionSummary(session, daysToFetch, adjustedEndDate);
+    const data = await getDailyHabitCompletionSummary(session, daysToFetch, currentViewEndDate);
     setDailyChartData(data.map(d => ({ date: d.completion_date, value: d.completion_percentage })));
     const avg = data.length > 0 ? data.reduce((sum, d) => sum + d.completion_percentage, 0) / data.length : 0;
     setDailyAvgPercentage(Math.round(avg));
@@ -111,8 +115,6 @@ const History: React.FC = () => {
     if (!session) return;
 
     let weeksToFetch = 16; // Default for 16W
-    let currentEndDate = startOfWeek(new Date(), { weekStartsOn: 1 });
-
     if (weeklyTimeRange === '5W') {
       weeksToFetch = 5;
     } else if (weeklyTimeRange === '16W') {
@@ -123,14 +125,35 @@ const History: React.FC = () => {
       weeksToFetch = 52;
     }
 
-    // Adjust the end date based on the offset
-    const adjustedEndDate = subWeeks(currentEndDate, weeksToFetch * weeklyDateOffset);
+    // Calculate the end date for the current view based on the offset
+    const currentViewEndDate = subWeeks(startOfWeek(new Date(), { weekStartsOn: 1 }), weeksToFetch * weeklyDateOffset);
 
-    const data = await getWeeklyHabitCompletionSummary(session, weeksToFetch, adjustedEndDate);
+    const data = await getWeeklyHabitCompletionSummary(session, weeksToFetch, currentViewEndDate);
     setWeeklyChartData(data.map(d => ({ date: d.week_start_date, value: d.completion_percentage })));
     const avg = data.length > 0 ? data.reduce((sum, d) => sum + d.completion_percentage, 0) / data.length : 0;
     setWeeklyAvgPercentage(Math.round(avg));
   }, [session, weeklyTimeRange, weeklyDateOffset]);
+
+  const fetchMonthlyChartData = useCallback(async () => {
+    if (!session) return;
+
+    let monthsToFetch = 12; // Default for 12M
+    if (monthlyTimeRange === '6M') {
+      monthsToFetch = 6;
+    } else if (monthlyTimeRange === '12M') {
+      monthsToFetch = 12;
+    } else if (monthlyTimeRange === '2Y') { // 2 years
+      monthsToFetch = 24;
+    }
+
+    // Calculate the end date for the current view based on the offset
+    const currentViewEndDate = subMonths(startOfMonth(new Date()), monthsToFetch * monthlyDateOffset);
+
+    const data = await getMonthlyHabitCompletionSummary(session, monthsToFetch, currentViewEndDate);
+    setMonthlyChartData(data.map(d => ({ date: d.month_start_date, value: d.completion_percentage })));
+    const avg = data.length > 0 ? data.reduce((sum, d) => sum + d.completion_percentage, 0) / data.length : 0;
+    setMonthlyAvgPercentage(Math.round(avg));
+  }, [session, monthlyTimeRange, monthlyDateOffset]);
 
 
   useEffect(() => {
@@ -138,8 +161,9 @@ const History: React.FC = () => {
       fetchHabitsAndHistory();
       fetchDailyChartData();
       fetchWeeklyChartData();
+      fetchMonthlyChartData(); // Fetch monthly data
     }
-  }, [fetchHabitsAndHistory, fetchDailyChartData, fetchWeeklyChartData, sessionLoading]);
+  }, [fetchHabitsAndHistory, fetchDailyChartData, fetchWeeklyChartData, fetchMonthlyChartData, sessionLoading]);
 
   const dailyTimeRangeOptions = [
     { label: '7D', value: '7D' },
@@ -155,6 +179,12 @@ const History: React.FC = () => {
     { label: '12M', value: '12M' },
   ];
 
+  const monthlyTimeRangeOptions = [
+    { label: '6M', value: '6M' },
+    { label: '12M', value: '12M' },
+    { label: '2Y', value: '2Y' },
+  ];
+
   const getDailyDateRangeLabel = () => {
     if (dailyChartData.length === 0) return '';
     const firstDate = new Date(dailyChartData[0].date);
@@ -167,6 +197,13 @@ const History: React.FC = () => {
     const firstDate = new Date(weeklyChartData[0].date);
     const lastDate = new Date(weeklyChartData[weeklyChartData.length - 1].date);
     return `${format(firstDate, 'MMM d, yyyy')} - ${format(lastDate, 'MMM d, yyyy')}`;
+  };
+
+  const getMonthlyDateRangeLabel = () => {
+    if (monthlyChartData.length === 0) return '';
+    const firstDate = new Date(monthlyChartData[0].date);
+    const lastDate = new Date(monthlyChartData[monthlyChartData.length - 1].date);
+    return `${format(firstDate, 'MMM yyyy')} - ${format(lastDate, 'MMM yyyy')}`;
   };
 
   if (isLoading || sessionLoading) {
@@ -253,6 +290,18 @@ const History: React.FC = () => {
             onNavigateDates={(direction) => setWeeklyDateOffset(prev => direction === 'prev' ? prev + 1 : Math.max(0, prev - 1))}
             dateRangeLabel={getWeeklyDateRangeLabel()}
             chartType="weekly"
+          />
+
+          <HabitCompletionChart
+            title="Monthly goals"
+            data={monthlyChartData}
+            averagePercentage={monthlyAvgPercentage}
+            timeRangeOptions={monthlyTimeRangeOptions}
+            selectedTimeRange={monthlyTimeRange}
+            onTimeRangeChange={setMonthlyTimeRange}
+            onNavigateDates={(direction) => setMonthlyDateOffset(prev => direction === 'prev' ? prev + 1 : Math.max(0, prev - 1))}
+            dateRangeLabel={getMonthlyDateRangeLabel()}
+            chartType="daily" {/* Using 'daily' for formatting as it's date-based, not week-based */}
           />
         </div>
       )}
