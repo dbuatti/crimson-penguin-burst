@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import * as LucideIcons from 'lucide-react';
 import { Circle } from 'lucide-react';
 import HistoryHabitGrid from './HistoryHabitGrid';
-import { isSameDay, parseISO, subDays, isBefore } from 'date-fns';
+import { isSameDay, parseISO, subDays, isBefore, format, addDays } from 'date-fns'; // Added format and addDays
 
 interface HistoryHabitCardProps {
   habit: Habit;
