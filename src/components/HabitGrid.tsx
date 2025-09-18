@@ -16,15 +16,14 @@ const HabitGrid: React.FC<HabitGridProps> = ({
 }) => {
   const today = new Date();
   today.setHours(0, 0, 0, 0); // Normalize today to start of day
-  const todayFormatted = format(today, 'yyyy-MM-dd'); // String representation of today for consistent comparison
 
-  // Calculate the start date for the grid to show NUM_WEEKS_TO_SHOW weeks ending on the current day's week.
-  const startOfCurrentWeek = startOfWeek(today, { weekStartsOn: 1 }); // Monday is the start of the week
-  const gridStartDate = subWeeks(startOfCurrentWeek, NUM_WEEKS_TO_SHOW - 1);
+  // Determine the Monday of the week that is NUM_WEEKS_TO_SHOW - 1 weeks ago from today's week.
+  const startOfThisWeek = startOfWeek(today, { weekStartsOn: 1 }); // Monday of the current week
+  const firstMondayToDisplay = subWeeks(startOfThisWeek, NUM_WEEKS_TO_SHOW - 1);
 
   const dates: Date[] = [];
   for (let i = 0; i < NUM_WEEKS_TO_SHOW * 7; i++) {
-    dates.push(addDays(gridStartDate, i));
+    dates.push(addDays(firstMondayToDisplay, i));
   }
 
   return (
@@ -42,18 +41,21 @@ const HabitGrid: React.FC<HabitGridProps> = ({
       <div className="grid grid-cols-7 gap-1">
         {dates.map((date, index) => {
           const dateFormatted = format(date, 'yyyy-MM-dd');
-          const isCurrentDay = dateFormatted === todayFormatted; // Check if this grid cell represents today
           const isCompleted = completionDates.includes(dateFormatted);
+          const isPast = date < today;
+          const isFuture = date > today;
+          const isCurrentDay = isSameDay(date, today);
 
           return (
             <div
               key={index}
               className={cn(
                 "w-5 h-5 rounded-sm transition-all duration-200",
-                "bg-accent", // Default background for incomplete/future days
                 {
-                  "opacity-50": date > today, // Dim future dates (using Date object comparison)
-                  "border border-primary/50": isCurrentDay, // Highlight today with a subtle border
+                  "bg-accent": !isCompleted && !isPast, // Default for incomplete future/current days
+                  "bg-muted": isPast && !isCompleted, // Distinct background for past incomplete days
+                  "border border-primary/50": isCurrentDay && !isCompleted, // Highlight today with a subtle border if incomplete
+                  "opacity-50": isFuture, // Dim future dates
                 }
               )}
               style={{ backgroundColor: isCompleted ? habitColor : undefined }}
