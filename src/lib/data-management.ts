@@ -28,6 +28,11 @@ const mapSupabaseHabitToAppHabit = (data: any): Habit => ({
   archived: data.archived,
 });
 
+// Helper function to create Lucide icons with consistent styling
+const createLucideIcon = (IconComponent: React.ElementType) => {
+  return <IconComponent className="h-4 w-4" />;
+};
+
 export const getHabits = async (session: Session | null): Promise<Habit[]> => {
   const userId = getUserId(session);
   if (!userId) return [];
@@ -233,7 +238,7 @@ export const saveLocalHabits = (habits: Habit[]): void => {
 export const exportHabits = async (session: Session | null) => {
   const userId = getUserId(session);
   if (!userId) {
-    showError('You must be logged in to export habits.', { icon: <X className="h-4 w-4" /> });
+    showError('You must be logged in to export habits.', { icon: createLucideIcon(X) });
     return;
   }
 
@@ -245,7 +250,7 @@ export const exportHabits = async (session: Session | null) => {
 
     if (error) {
       console.error("Error fetching habits for export:", error);
-      showError('Failed to export habits.', { icon: <X className="h-4 w-4" /> });
+      showError('Failed to export habits.', { icon: createLucideIcon(X) });
       return;
     }
 
@@ -260,17 +265,17 @@ export const exportHabits = async (session: Session | null) => {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    showSuccess('Habits exported successfully!', { icon: <Check className="h-4 w-4" /> });
+    showSuccess('Habits exported successfully!', { icon: createLucideIcon(Check) });
   } catch (error) {
     console.error("Error during habit export:", error);
-    showError('Failed to export habits.', { icon: <X className="h-4 w-4" /> });
+    showError('Failed to export habits.', { icon: createLucideIcon(X) });
   }
 };
 
 export const importHabits = async (file: File, session: Session | null) => {
   const userId = getUserId(session);
   if (!userId) {
-    showError('You must be logged in to import habits.', { icon: <X className="h-4 w-4" /> });
+    showError('You must be logged in to import habits.', { icon: createLucideIcon(X) });
     return;
   }
 
@@ -319,16 +324,16 @@ export const importHabits = async (file: File, session: Session | null) => {
     }
 
     if (successCount > 0) {
-      showSuccess(`Successfully imported ${successCount} habit(s)!`, { icon: <Check className="h-4 w-4" /> });
+      showSuccess(`Successfully imported ${successCount} habit(s)!`, { icon: createLucideIcon(Check) });
     }
     if (failCount > 0) {
-      showError(`Failed to import ${failCount} habit(s). Check console for details.`, { icon: <X className="h-4 w-4" /> });
+      showError(`Failed to import ${failCount} habit(s). Check console for details.`, { icon: createLucideIcon(X) });
     }
     if (successCount === 0 && failCount === 0) {
-      showError('No habits found in the imported file.', { icon: <X className="h-4 w-4" /> });
+      showError('No habits found in the imported file.', { icon: createLucideIcon(X) });
     }
   } catch (error: any) {
     console.error("Error during habit import:", error);
-    showError(`Failed to import habits: ${error.message || 'Invalid file format.'}`, { icon: <X className="h-4 w-4" /> });
+    showError(`Failed to import habits: ${error.message || 'Invalid file format.'}`, { icon: createLucideIcon(X) });
   }
 };
