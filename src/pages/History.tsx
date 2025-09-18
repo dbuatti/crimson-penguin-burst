@@ -52,7 +52,7 @@ const History: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground p-6 flex flex-col items-center">
-      <PageHeader title="Habit History" backLink="/" />
+      <PageHeader title="" backLink="/" /> {/* Removed the title "Habit History" */}
 
       <div className="w-full max-w-md space-y-6 mb-8">
         {habitsHistory.length === 0 ? (
