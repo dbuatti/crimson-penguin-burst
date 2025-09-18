@@ -18,13 +18,15 @@ export const SessionContextProvider: React.FC<{ children: React.ReactNode }> = (
   const location = useLocation();
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, currentSession) => {
-      setSession(currentSession);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, currentSession) => {
+      // Always re-fetch the session to ensure we have the latest state from Supabase
+      const { data: { session: latestSession } } = await supabase.auth.getSession();
+      setSession(latestSession);
       setLoading(false);
 
-      if (currentSession && location.pathname === '/login') {
+      if (latestSession && location.pathname === '/login') {
         navigate('/'); // Redirect authenticated users from login page to home
-      } else if (!currentSession && location.pathname !== '/login') {
+      } else if (!latestSession && location.pathname !== '/login') {
         navigate('/login'); // Redirect unauthenticated users to login page
       }
     });
