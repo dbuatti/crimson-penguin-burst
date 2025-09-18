@@ -1,10 +1,9 @@
 import React from 'react';
 import { Habit } from '@/types/habit';
-import { Check, Minus, Plus, Circle } from 'lucide-react';
+import { Check, Circle } from 'lucide-react'; // Only Check and Circle are needed for indicators
 import * as LucideIcons from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress'; // Using shadcn Progress for the circle effect
 import { Link } from 'react-router-dom';
 import {
   DropdownMenu,
@@ -20,8 +19,7 @@ interface HabitListItemProps {
   onArchiveHabit: (id: string) => void;
   onDeleteHabit: (id: string) => void;
   onToggleCompletion: (habitId: string, dateString: string) => Promise<boolean>;
-  onIncrementCompletion: (habitId: string, dateString: string) => Promise<boolean>;
-  onDecrementCompletion: (habitId: string, dateString: string) => Promise<boolean>;
+  // Removed onIncrementCompletion and onDecrementCompletion as per design
 }
 
 const HabitListItem: React.FC<HabitListItemProps> = ({
@@ -30,8 +28,6 @@ const HabitListItem: React.FC<HabitListItemProps> = ({
   onArchiveHabit,
   onDeleteHabit,
   onToggleCompletion,
-  onIncrementCompletion,
-  onDecrementCompletion,
 }) => {
   const today = new Date().toISOString().split('T')[0];
 
@@ -48,20 +44,9 @@ const HabitListItem: React.FC<HabitListItemProps> = ({
     if (success) onHabitUpdate();
   };
 
-  const handleIncrement = async () => {
-    const success = await onIncrementCompletion(habit.id, today);
-    if (success) onHabitUpdate();
-  };
-
-  const handleDecrement = async () => {
-    const success = await onDecrementCompletion(habit.id, today);
-    if (success) onHabitUpdate();
-  };
-
   const isSimpleDailyHabit = habit.goalType === 'daily' && habit.goalValue === 1;
   const currentCompletion = habit.currentCompletionCount || 0;
   const goal = habit.goalValue;
-  const progressPercentage = goal > 0 ? Math.min(100, (currentCompletion / goal) * 100) : 0;
 
   const getGoalText = () => {
     if (habit.description) return habit.description;
@@ -93,7 +78,7 @@ const HabitListItem: React.FC<HabitListItemProps> = ({
             className={cn(
               "h-9 w-9 rounded-full border-2 transition-colors duration-200",
               habit.isCompletedToday
-                ? "bg-green-500 border-green-500 text-white hover:bg-green-600 hover:border-green-600"
+                ? "bg-[#22C55E] border-[#22C55E] text-white hover:bg-[#1EAD55] hover:border-[#1EAD55]" // Specific green for completed
                 : "bg-secondary border-border text-muted-foreground hover:bg-accent hover:text-accent-foreground"
             )}
             aria-label={habit.isCompletedToday ? 'Mark as incomplete' : 'Mark as complete'}
@@ -101,40 +86,11 @@ const HabitListItem: React.FC<HabitListItemProps> = ({
             {habit.isCompletedToday && <Check className="h-5 w-5" />}
           </Button>
         ) : (
-          <div className="flex items-center space-x-1">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleDecrement}
-              disabled={currentCompletion <= 0}
-              className="h-8 w-8 rounded-full text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors duration-200"
-              aria-label="Decrement completion"
-            >
-              <Minus className="h-4 w-4" />
-            </Button>
-            <div className="relative h-9 w-9 flex items-center justify-center">
-              <Progress
-                value={progressPercentage}
-                className="absolute h-full w-full rounded-full"
-                indicatorClassName="rounded-full"
-                style={{
-                  '--progress-background': habit.color,
-                  '--progress-indicator-color': habit.color,
-                } as React.CSSProperties}
-              />
-              <span className="relative z-10 text-sm font-semibold text-foreground">
-                {currentCompletion}
-              </span>
-            </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleIncrement}
-              className="h-8 w-8 rounded-full text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors duration-200"
-              aria-label="Increment completion"
-            >
-              <Plus className="h-4 w-4" />
-            </Button>
+          <div
+            className="h-9 w-9 rounded-full flex items-center justify-center text-sm font-semibold text-white"
+            style={{ backgroundColor: habit.color }}
+          >
+            {currentCompletion}
           </div>
         )}
         <DropdownMenu>
