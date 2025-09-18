@@ -29,10 +29,8 @@ const Settings: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground p-6 flex flex-col items-center">
-      {/* Removed PageHeader title="Settings" backLink="/" */}
-      {/* Removed the redundant h1 header */}
       <div className="w-full max-w-md space-y-4 p-6 bg-card border border-border rounded-xl shadow-lg">
-        <h2 className="text-xl font-semibold text-foreground mb-4">General Settings</h2>
+        {/* Removed the "General Settings" h2 header */}
         
         <div className="flex items-center justify-between">
           <span className="text-foreground">Theme</span>
