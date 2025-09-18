@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { Link, useLocation } => 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom'; // Corrected syntax
 import { cn } from '@/lib/utils';
 
 interface SegmentedControlProps {
@@ -39,7 +39,7 @@ const TopNavigation: React.FC = () => {
   ];
 
   return (
-    <header className="w-full max-w-4xl flex flex-col items-center py-2 px-4"> {/* Changed max-w-2xl to max-w-4xl */}
+    <header className="w-full max-w-4xl flex flex-col items-center py-2 px-4">
       <SegmentedControl segments={segments} />
     </header>
   );
