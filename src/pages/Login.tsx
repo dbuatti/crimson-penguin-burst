@@ -25,7 +25,7 @@ const Login: React.FC = () => {
                   defaultButtonBackground: 'hsl(var(--secondary))',
                   defaultButtonBorder: 'hsl(var(--border))',
                   defaultButtonText: 'hsl(var(--secondary-foreground))',
-                  defaultButtonBackgroundHover: 'hsl(var(--secondary-foreground))',
+                  defaultButtonBackgroundHover: 'hsl(var(--accent))', // Changed to accent for better dark mode hover
                 },
               },
             },
