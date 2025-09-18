@@ -5,7 +5,8 @@ import { Habit } from '@/types/habit';
 import HabitCard from '@/components/HabitCard';
 import { Button } from '@/components/ui/button';
 import { showSuccess, showError } from '@/utils/toast';
-import { ArrowLeft, Trash2 } from 'lucide-react'; // Only ArrowLeft and Trash2 are needed for buttons
+import { Trash2, Sparkles } from 'lucide-react'; // Only Trash2 and Sparkles are needed for buttons/empty state
+import PageHeader from '@/components/PageHeader'; // Import the new PageHeader
 import { useSession } from '@/components/SessionContextProvider';
 
 const ArchivedHabits: React.FC = () => {
@@ -68,20 +69,15 @@ const ArchivedHabits: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground p-6 flex flex-col items-center">
-      <header className="w-full max-w-md flex justify-between items-center mb-8">
-        <Button variant="ghost" size="icon" onClick={() => navigate('/')} className="text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors duration-200 rounded-lg">
-          <ArrowLeft className="h-5 w-5" />
-        </Button>
-        <h1 className="text-2xl font-bold text-foreground">Archived Habits</h1>
-        <div className="w-5" /> {/* Placeholder for alignment */}
-      </header>
+      <PageHeader title="Archived Habits" backLink="/" /> {/* Use PageHeader */}
 
       <div className="w-full max-w-md space-y-4 mb-8">
         {archivedHabits.length === 0 ? (
-          <div className="text-center text-muted-foreground mt-12 p-6 bg-card border border-border rounded-xl shadow-md">
+          <div className="text-center text-muted-foreground mt-12 p-6 bg-card border border-border rounded-xl shadow-md flex flex-col items-center justify-center">
+            <Sparkles className="h-12 w-12 text-primary mb-4" />
             <p className="text-lg mb-4">No archived habits.</p>
             <Button onClick={() => navigate('/')} className="bg-primary hover:bg-primary/90 text-primary-foreground transition-colors duration-200 rounded-lg">
-              <ArrowLeft className="mr-2 h-4 w-4" /> Back to Dashboard
+              Back to Dashboard
             </Button>
           </div>
         ) : (

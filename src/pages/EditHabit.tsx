@@ -4,8 +4,7 @@ import { getHabitById, updateHabit } from '@/lib/habit-storage';
 import { HabitFormData, Habit } from '@/types/habit';
 import HabitForm from '@/components/HabitForm';
 import { showSuccess, showError } from '@/utils/toast';
-import { X } from 'lucide-react'; // Only X is needed for the button
-import { Button } from '@/components/ui/button';
+import PageHeader from '@/components/PageHeader'; // Import the new PageHeader
 import { useSession } from '@/components/SessionContextProvider';
 
 const EditHabit: React.FC = () => {
@@ -83,13 +82,7 @@ const EditHabit: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground p-6 flex flex-col items-center">
-      <div className="w-full max-w-md flex justify-between items-center mb-8">
-        <Button variant="ghost" size="icon" onClick={() => navigate('/')} className="text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors duration-200 rounded-lg">
-          <X className="h-5 w-5" />
-        </Button>
-        <h1 className="text-2xl font-bold text-foreground">Edit Habit</h1>
-        <div className="w-5" /> {/* Placeholder for alignment */}
-      </div>
+      <PageHeader title="Edit Habit" backLink="/" /> {/* Use PageHeader */}
       <div className="w-full max-w-md">
         <HabitForm initialData={initialData} onSubmit={handleSubmit} isSubmitting={isSubmitting} />
       </div>
