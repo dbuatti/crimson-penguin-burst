@@ -74,6 +74,9 @@ export const getHabits = async (session: Session | null): Promise<Habit[]> => {
         isCompletedToday = currentCompletionCount >= mappedHabit.goalValue;
       }
 
+      console.log(`Habit ${mappedHabit.name} (${mappedHabit.id}) for ${today}: currentCompletionCount=${currentCompletionCount}, isCompletedToday=${isCompletedToday}`);
+
+
       habitsWithCompletion.push({
         ...mappedHabit,
         currentCompletionCount,
@@ -355,6 +358,7 @@ export const toggleHabitCompletion = async (habitId: HabitId, dateString: string
         console.error("Failed to delete habit log:", deleteError);
         return false;
       }
+      console.log(`Habit log ${existingLogs[0].id} for habit ${habitId} on ${dateString} deleted.`);
     } else {
       // If no log exists, insert one (mark as completed)
       const { error: insertError } = await supabase
@@ -371,6 +375,7 @@ export const toggleHabitCompletion = async (habitId: HabitId, dateString: string
         console.error("Failed to insert habit log:", insertError);
         return false;
       }
+      console.log(`Habit log for habit ${habitId} on ${dateString} inserted.`);
     }
     return true;
   } catch (error) {
@@ -398,6 +403,7 @@ export const incrementHabitCompletion = async (habitId: HabitId, dateString: str
       console.error("Failed to increment habit completion:", error);
       return false;
     }
+    console.log(`Habit log for habit ${habitId} on ${dateString} incremented.`);
     return true;
   } catch (error) {
     console.error("Failed to increment habit completion:", error);
@@ -435,9 +441,11 @@ export const decrementHabitCompletion = async (habitId: HabitId, dateString: str
         console.error("Failed to decrement habit completion:", deleteError);
         return false;
       }
+      console.log(`Habit log ${existingLogs[0].id} for habit ${habitId} on ${dateString} decremented.`);
       return true;
     } else {
       // No logs to decrement
+      console.log(`No habit logs found for habit ${habitId} on ${dateString} to decrement.`);
       return false;
     }
   } catch (error) {
