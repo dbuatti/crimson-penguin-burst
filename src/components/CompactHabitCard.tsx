@@ -1,7 +1,7 @@
 import React from 'react';
 import { Habit } from '@/types/habit';
 import { Card, CardContent } from '@/components/ui/card';
-import * => LucideIcons from 'lucide-react';
+import * as LucideIcons from 'lucide-react'; // Corrected import statement
 import { Circle } from 'lucide-react';
 import CompactHabitGrid from './CompactHabitGrid';
 
