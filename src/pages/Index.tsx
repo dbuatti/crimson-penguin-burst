@@ -75,8 +75,8 @@ const Index = () => {
     }
   };
 
-  const handleExport = () => {
-    exportHabits();
+  const handleExport = async () => {
+    await exportHabits(session);
     toast.success('Habits exported successfully!', {
       icon: <Download className="h-4 w-4" />,
     });
@@ -86,7 +86,7 @@ const Index = () => {
     const file = event.target.files?.[0];
     if (file) {
       try {
-        await importHabits(file);
+        await importHabits(file, session);
         toast.success('Habits imported successfully! Refreshing...', {
           icon: <Upload className="h-4 w-4" />,
         });
@@ -137,16 +137,16 @@ const Index = () => {
                   <Settings className="h-5 w-5" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="bg-popover border-border text-foreground shadow-lg rounded-lg">
-                <DropdownMenuItem asChild className="hover:bg-accent hover:text-accent-foreground transition-colors duration-150 cursor-pointer rounded-md">
-                  <Link to="/archived-habits" className="flex items-center p-2">
+              <DropdownMenuContent align="start" className="bg-popover border-border text-foreground shadow-lg rounded-lg p-1">
+                <DropdownMenuItem asChild className="hover:bg-accent hover:text-accent-foreground transition-colors duration-150 cursor-pointer rounded-md px-2 py-1.5">
+                  <Link to="/archived-habits" className="flex items-center">
                     <Archive className="mr-2 h-4 w-4" /> View Archived Habits
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={handleExport} className="flex items-center hover:bg-accent hover:text-accent-foreground transition-colors duration-150 cursor-pointer rounded-md">
+                <DropdownMenuItem onClick={handleExport} className="flex items-center hover:bg-accent hover:text-accent-foreground transition-colors duration-150 cursor-pointer rounded-md px-2 py-1.5">
                   <Download className="mr-2 h-4 w-4" /> Export Data
                 </DropdownMenuItem>
-                <DropdownMenuItem className="flex items-center relative hover:bg-accent hover:text-accent-foreground transition-colors duration-150 cursor-pointer rounded-md">
+                <DropdownMenuItem className="flex items-center relative hover:bg-accent hover:text-accent-foreground transition-colors duration-150 cursor-pointer rounded-md px-2 py-1.5">
                   <Upload className="mr-2 h-4 w-4" /> Import Data
                   <input
                     type="file"
@@ -156,7 +156,7 @@ const Index = () => {
                   />
                 </DropdownMenuItem>
                 {session && (
-                  <DropdownMenuItem onClick={handleLogout} className="flex items-center text-destructive hover:bg-destructive/10 hover:text-destructive transition-colors duration-150 cursor-pointer rounded-md">
+                  <DropdownMenuItem onClick={handleLogout} className="flex items-center text-destructive hover:bg-destructive/10 hover:text-destructive transition-colors duration-150 cursor-pointer rounded-md px-2 py-1.5">
                     <LogOut className="mr-2 h-4 w-4" /> Logout
                   </DropdownMenuItem>
                 )}

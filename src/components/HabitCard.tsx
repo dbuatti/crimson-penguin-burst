@@ -75,24 +75,24 @@ const HabitCard: React.FC<HabitCardProps> = ({ habit, onHabitUpdate, onArchiveHa
                 <MoreVertical className="h-5 w-5" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="bg-popover border-border text-foreground shadow-lg rounded-lg">
-              <DropdownMenuItem asChild className="hover:bg-accent hover:text-accent-foreground transition-colors duration-150 cursor-pointer rounded-md">
-                <Link to={`/edit-habit/${habit.id}`} className="flex items-center p-2">
+            <DropdownMenuContent align="end" className="bg-popover border-border text-foreground shadow-lg rounded-lg p-1">
+              <DropdownMenuItem asChild className="hover:bg-accent hover:text-accent-foreground transition-colors duration-150 cursor-pointer rounded-md px-2 py-1.5">
+                <Link to={`/edit-habit/${habit.id}`} className="flex items-center">
                   <Edit className="mr-2 h-4 w-4" /> Edit
                 </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem asChild className="hover:bg-accent hover:text-accent-foreground transition-colors duration-150 cursor-pointer rounded-md">
-                <Link to={`/habit-calendar/${habit.id}`} className="flex items-center p-2">
+              <DropdownMenuItem asChild className="hover:bg-accent hover:text-accent-foreground transition-colors duration-150 cursor-pointer rounded-md px-2 py-1.5">
+                <Link to={`/habit-calendar/${habit.id}`} className="flex items-center">
                   <CalendarDays className="mr-2 h-4 w-4" /> Calendar
                 </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onArchiveHabit(habit.id)} className="flex items-center hover:bg-accent hover:text-accent-foreground transition-colors duration-150 cursor-pointer rounded-md">
+              <DropdownMenuItem onClick={() => onArchiveHabit(habit.id)} className="flex items-center hover:bg-accent hover:text-accent-foreground transition-colors duration-150 cursor-pointer rounded-md px-2 py-1.5">
                 <Archive className="mr-2 h-4 w-4" /> {habit.archived ? 'Unarchive' : 'Archive'}
               </DropdownMenuItem>
-              <DropdownMenuItem className="flex items-center hover:bg-accent hover:text-accent-foreground transition-colors duration-150 cursor-pointer rounded-md">
+              <DropdownMenuItem className="flex items-center hover:bg-accent hover:text-accent-foreground transition-colors duration-150 cursor-pointer rounded-md px-2 py-1.5">
                 <Share2 className="mr-2 h-4 w-4" /> Share
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onDeleteHabit(habit.id)} className="flex items-center text-destructive hover:bg-destructive/10 hover:text-destructive transition-colors duration-150 cursor-pointer rounded-md">
+              <DropdownMenuItem onClick={() => onDeleteHabit(habit.id)} className="flex items-center text-destructive hover:bg-destructive/10 hover:text-destructive transition-colors duration-150 cursor-pointer rounded-md px-2 py-1.5">
                 <Trash2 className="mr-2 h-4 w-4" /> Delete
               </DropdownMenuItem>
             </DropdownMenuContent>
