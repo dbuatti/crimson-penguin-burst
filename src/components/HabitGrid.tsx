@@ -26,7 +26,7 @@ const HabitGrid: React.FC<HabitGridProps> = ({
   }
 
   return (
-    <div className="p-3 rounded-md bg-secondary border border-border overflow-hidden">
+    <div className="px-3 pb-3 pt-6 rounded-md bg-secondary border border-border overflow-hidden"> {/* Adjusted padding-top here */}
       <div className="grid grid-cols-7 gap-1">
         {dates.map((date, index) => {
           const dateFormatted = format(date, 'yyyy-MM-dd');
@@ -43,7 +43,7 @@ const HabitGrid: React.FC<HabitGridProps> = ({
               className="relative w-5 h-5" // Fixed size for the grid cell
             >
               {isFirstDayOfMonth && (
-                <div className="absolute -top-12 left-1/2 -translate-x-1/2 text-[8px] font-bold uppercase text-muted-foreground whitespace-nowrap z-10">
+                <div className="absolute bottom-full mb-1 left-1/2 -translate-x-1/2 text-[8px] font-bold uppercase text-muted-foreground whitespace-nowrap z-10"> {/* Adjusted positioning */}
                   {format(date, 'MMM')}
                 </div>
               )}
