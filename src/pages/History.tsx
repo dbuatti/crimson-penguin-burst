@@ -3,7 +3,7 @@ import { getHabits, getHabitCompletionLogs, getAllHabitLogs, getDailyHabitComple
 import { Habit } from '@/types/habit';
 import { useSession } from '@/components/SessionContextProvider';
 import CompactHabitCard from '@/components/CompactHabitCard';
-import { Sparkles, BarChart3, Archive, Calendar, ListTodo } from 'lucide-react'; // Added ListTodo icon
+import { Sparkles, BarChart3, Archive, Calendar, ListTodo } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { cn, calculateOverallStreaks } from '@/lib/utils';
